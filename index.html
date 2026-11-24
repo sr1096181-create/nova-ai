@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Nova AI – Universal Intelligent Companion</title>
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/pptxgenjs@3.12.0/dist/pptxgen.bundle.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <style>
+    :root { --bg:#080a12; --card:#111526; --card2:#161c33; --border:#1e2645; --primary:#3b82f6; --sec:#8b5cf6; --text:#f1f5f9; --muted:#94a3b8; }
+    * { box-sizing:border-box; margin:0; padding:0; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif; }
+    body { background:var(--bg); color:var(--text); height:100dvh; display:flex; flex-direction:column; overflow:hidden; }
+    header { padding:10px 14px; background:rgba(17,21,38,0.96); border-bottom:1px solid var(--border); display:flex; justify-content:space-between; align-items:center; }
+    .brand { display:flex; align-items:center; gap:9px; }
+    .logo { width:34px; height:34px; border-radius:10px; background:linear-gradient(135deg,#3b82f6,#8b5cf6); display:flex; align-items:center; justify-content:center; font-weight:900; color:#fff; }
+    .brand h1 { font-size:1.15rem; font-weight:800; background:linear-gradient(90deg,#60a5fa,#a78bfa); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
+    .brand p { font-size:0.68rem; color:var(--muted); }
+    .pill { font-size:0.68rem; padding:4px 8px; border-radius:999px; background:rgba(16,185,129,0.14); color:#34d399; border:1px solid rgba(16,185,129,0.35); }
+    .pill.off { background:rgba(239,68,68,0.14); color:#f87171; border-color:rgba(239,68,68,0.35); }
+    .call-top { background:linear-gradient(135deg,#10b981,#059669); color:#fff; border:none; padding:6px 11px; border-radius:999px; font-size:0.76rem; font-weight:700; cursor:pointer; }
+    main { flex:1; overflow-y:auto; }
+    .view { display:none; height:100%; flex-direction:column; }
+    .view.active { display:flex; }
+    .pad { padding:14px; overflow-y:auto; display:flex; flex-direction:column; gap:12px; }
+    .card { background:var(--card); border:1px solid var(--border); border-radius:14px; padding:13px; }
+    .hero { background:linear-gradient(135deg,rgba(59,130,246,0.22),rgba(139,92,246,0.25)); border:1px solid rgba(96,165,250,0.4); border-radius:16px; padding:15px; display:flex; justify-content:space-between; align-items:center; gap:10px; cursor:pointer; }
+    .grid2 { display:grid; grid-template-columns:repeat(2,1fr); gap:9px; }
+    .tile { background:var(--card); border:1px solid var(--border); border-radius:13px; padding:12px; cursor:pointer; }
+    .tile h3 { font-size:0.85rem; margin:4px 0 2px; }
+    .tile p { font-size:0.7rem; color:var(--muted); }
+    input, textarea, select { width:100%; background:#0b0e1a; border:1px solid var(--border); color:var(--text); padding:10px 12px; border-radius:11px; font-size:0.88rem; outline:none; }
+    .btn { background:linear-gradient(135deg,#3b82f6,#8b5cf6); color:#fff; border:none; padding:9px 13px; border-radius:10px; font-size:0.82rem; font-weight:700; cursor:pointer; display:inline-flex; align-items:center; justify-content:center; gap:5px; }
+    .btn-ghost { background:var(--card2); border:1px solid var(--border); }
+    .chat-top { padding:7px 12px; background:rgba(17,21,38,0.9); border-bottom:1px solid var(--border); display:flex; justify-content:space-between; align-items:center; gap:6px; }
+    .chat-feed { flex:1; padding:12px; overflow-y:auto; display:flex; flex-direction:column; gap:11px; }
+    .msg { max-width:88%; padding:11px 13px; border-radius:15px; font-size:0.9rem; line-height:1.52; word-wrap:break-word; }
+    .msg.ai { align-self:flex-start; background:var(--card); border:1px solid var(--border); border-bottom-left-radius:4px; }
+    .msg.user { align-self:flex-end; background:linear-gradient(135deg,#3b82f6,#7c3aed); color:#fff; border-bottom-right-radius:4px; }
+    .tool-tag { display:inline-block; font-size:0.68rem; font-weight:700; color:#60a5fa; background:rgba(59,130,246,0.14); padding:2px 8px; border-radius:999px; margin-bottom:6px; }
+    .msg pre { background:#06080f; border:1px solid #263056; border-radius:9px; padding:9px; overflow-x:auto; margin:7px 0; position:relative; font-size:0.8rem; }
+    .copy-code { position:absolute; top:5px; right:5px; background:#1e293b; color:#93c5fd; border:none; padding:2px 6px; border-radius:5px; font-size:0.66rem; cursor:pointer; }
+    .msg-bar { margin-top:7px; padding-top:6px; border-top:1px solid rgba(255,255,255,0.06); display:flex; flex-wrap:wrap; gap:6px; }
+    .chip { background:rgba(255,255,255,0.07); border:none; color:#cbd5e1; padding:3px 8px; border-radius:6px; font-size:0.7rem; cursor:pointer; }
+    .src-link { display:block; background:#0b1021; border:1px solid #233058; padding:7px 10px; border-radius:9px; color:#93c5fd; text-decoration:none; font-size:0.78rem; margin-top:6px; }
+    .att-bar { display:none; padding:6px 12px; background:#131933; border-top:1px solid var(--border); justify-content:space-between; align-items:center; font-size:0.78rem; color:#93c5fd; }
+    .composer { padding:8px 10px; background:var(--card); border-top:1px solid var(--border); display:flex; gap:6px; align-items:center; }
+    .composer input { border-radius:999px; padding:10px 13px; }
+    .rbtn { width:39px; height:39px; border-radius:50%; border:none; background:var(--card2); color:#fff; font-size:1.05rem; cursor:pointer; flex-shrink:0; display:flex; align-items:center; justify-content:center; }
+    .rbtn.send { background:linear-gradient(135deg,#3b82f6,#8b5cf6); }
+    nav { display:flex; background:#0b0e1a; border-top:1px solid var(--border); padding:6px 0 8px; }
+    .nav-b { flex:1; background:none; border:none; color:var(--muted); display:flex; flex-direction:column; align-items:center; gap:2px; font-size:0.68rem; cursor:pointer; }
+    .nav-b.active { color:#60a5fa; font-weight:700; }
+    #callOverlay { position:fixed; inset:0; background:linear-gradient(180deg,#0b132b,#05070c); z-index:200; display:none; flex-direction:column; justify-content:space-between; align-items:center; padding:34px 20px; text-align:center; }
+    #callOverlay.open { display:flex; }
+    .orb { width:116px; height:116px; border-radius:50%; background:linear-gradient(135deg,#2563eb,#7c3aed); display:flex; align-items:center; justify-content:center; font-size:2.5rem; font-weight:800; color:#fff; box-shadow:0 0 35px rgba(59,130,246,0.6); }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="brand"><div class="logo">N</div><div><h1>Nova AI</h1><p>Universal Intelligent Companion</p></div></div>
+    <div style="display:flex;align-items:center;gap:7px;">
+      <div id="connPill" class="pill">● Connected</div>
+      <button class="call-top" onclick="startLiveCall()">📞 Live Call</button>
+    </div>
+  </header>
+
+  <main>
+    <!-- HOME SCREEN -->
+    <section id="view-home" class="view active">
+      <div class="pad">
+        <div class="hero" onclick="switchTab('chat')">
+          <div><h2 style="font-size:1rem;margin-bottom:3px;">🧠 Universal AI Chat (ChatGPT Mode)</h2><p style="font-size:0.76rem;color:#cbd5e1;">एक ही चैट में बोलें, लिखें, PDF/Word/Excel/फोटो भेजें — AI खुद सही टूल चुनेगा!</p></div>
+          <div style="font-size:1.7rem;">✨</div>
+        </div>
+        <div class="grid2">
+          <div class="tile" onclick="quickAsk('पटना के एक सुंदर भविष्य के शहर की फोटो बनाओ')"><div style="font-size:1.3rem;">🎨</div><h3>Image Generation</h3><p>लिखते ही नई फोटो बनाएं</p></div>
+          <div class="tile" onclick="switchTab('chat');document.getElementById('filePicker').click()"><div style="font-size:1.3rem;">📎</div><h3>PDF / Doc / Vision</h3><p>PDF, Word, Excel व फोटो समझें</p></div>
+          <div class="tile" onclick="quickAsk('आज की भारत की मुख्य ताज़ा खबरें सर्च करके बताओ')"><div style="font-size:1.3rem;">🌐</div><h3>Live Web Search</h3><p>सत्यापित वेबसाइट लिंक सहित जवाब</p></div>
+          <div class="tile" onclick="quickAsk('Photosynthesis Class 10 पर 5 स्लाइड की PPT बनाओ')"><div style="font-size:1.3rem;">📑</div><h3>PPT / Word / Excel</h3><p>डाउनलोड करने योग्य फाइल बनाएं</p></div>
+          <div class="tile" onclick="quickAsk('प्रकाश का परावर्तन (Reflection of Light) नियम सहित सरल हिंदी में समझाओ')"><div style="font-size:1.3rem;">📚</div><h3>Study & Coding AI</h3><p>Class 10/12, NDA व प्रोग्रामिंग</p></div>
+          <div class="tile" onclick="startLiveCall()"><div style="font-size:1.3rem;">📞</div><h3>Live Voice Call</h3><p>हिंदी, भोजपुरी, English में लाइव कॉल</p></div>
+        </div>
+      </div>
+    </section>
+    <!-- UNIVERSAL CHAT -->
+    <section id="view-chat" class="view">
+      <div class="chat-top">
+        <span style="font-size:0.76rem;color:#93c5fd;">🧠 Universal Brain (Auto-Tool Routing)</span>
+        <button class="btn btn-ghost" style="padding:4px 9px;font-size:0.74rem;" onclick="newChat()">+ New Chat</button>
+      </div>
+      <div id="chatFeed" class="chat-feed"></div>
+      <div id="attBar" class="att-bar">
+        <span id="attLabel">📎 File attached</span>
+        <button onclick="clearAttachment()" style="background:none;border:none;color:#f87171;font-weight:700;cursor:pointer;">✕ हटाएं</button>
+      </div>
+      <div class="composer">
+        <input type="file" id="filePicker" accept=".pdf,.docx,.txt,.csv,.xlsx,.xls,image/*" style="display:none;" onchange="handleAttachment(event)" />
+        <button class="rbtn" onclick="document.getElementById('filePicker').click()" title="Attach PDF, Word, Excel, Image">📎</button>
+        <button class="rbtn" onclick="voiceToInput()" title="Voice Input">🎤</button>
+        <input id="chatInput" type="text" placeholder="कुछ भी पूछें, फोटो बनवाएं, सर्च करें या फाइल भेजें..." onkeydown="if(event.key==='Enter') sendUniversal()" />
+        <button class="rbtn send" onclick="sendUniversal()">➤</button>
+      </div>
+    </section>
+
+    <!-- HISTORY -->
+    <section id="view-history" class="view">
+      <div class="pad">
+        <div style="display:flex;justify-content:space-between;align-items:center;">
+          <h3>🕒 पुरानी बातचीत (History)</h3>
+          <button class="btn btn-ghost" style="padding:5px 10px;font-size:0.75rem;" onclick="localStorage.removeItem('nova_chats');renderHistory();">सब मिटाएं</button>
+        </div>
+        <div id="historyList" style="display:flex;flex-direction:column;gap:8px;"></div>
+      </div>
+    </section>
+
+    <!-- SETTINGS & MEMORY -->
+    <section id="view-settings" class="view">
+      <div class="pad">
+        <div class="card" style="display:flex;flex-direction:column;gap:9px;">
+          <h3>🔌 Server Connection</h3>
+          <input id="workerInput" type="url" placeholder="https://nova-ai-api.yourname.workers.dev" />
+          <button class="btn" onclick="saveWorker()">💾 Save Worker URL</button>
+        </div>
+        <div class="card" style="display:flex;flex-direction:column;gap:9px;">
+          <h3>🧠 AI Memory (आपकी जानकारी याद रखें)</h3>
+          <div style="display:flex;gap:6px;">
+            <input id="memInput" type="text" placeholder="जैसे: मैं Class 12 और NDA की तैयारी कर रहा हूँ..." />
+            <button class="btn" onclick="addMem()">Add</button>
+          </div>
+          <div id="memList" style="display:flex;flex-direction:column;gap:6px;"></div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <nav>
+    <button class="nav-b active" data-t="home" onclick="switchTab('home')"><span>🏠</span>Home</button>
+    <button class="nav-b" data-t="chat" onclick="switchTab('chat')"><span>💬</span>Chat</button>
+    <button class="nav-b" data-t="history" onclick="switchTab('history')"><span>🕒</span>History</button>
+    <button class="nav-b" data-t="settings" onclick="switchTab('settings')"><span>⚙️</span>Settings</button>
+  </nav>
+
+  <!-- LIVE PHONE CALL OVERLAY -->
+  <div id="callOverlay">
+    <div><div style="font-size:0.72rem;color:#64748b;">🔒 NOVA HD VOICE CALL</div><h2 style="margin-top:4px;">Nova AI</h2><div id="callTimer" style="color:#34d399;font-weight:700;">Calling...</div></div>
+    <div style="display:flex;flex-direction:column;align-items:center;gap:16px;width:100%;">
+      <div class="orb" onclick="interruptCall()">N</div>
+      <div id="callStatus" style="font-size:0.86rem;color:#cbd5e1;">कॉल जुड़ रही है...</div>
+      <div id="callCaps" style="width:92%;max-height:110px;overflow-y:auto;background:rgba(15,23,42,0.75);padding:10px;border-radius:12px;font-size:0.88rem;">नमस्ते!</div>
+    </div>
+    <div style="display:flex;gap:18px;align-items:center;">
+      <select id="callLangSel" style="width:auto;border-radius:999px;">
+        <option value="hi-IN|pure Devanagari Hindi">🇮🇳 हिन्दी</option>
+        <option value="hi-IN|sweet natural Bhojpuri in Devanagari">🌾 भोजपुरी</option>
+        <option value="en-IN|natural English">🇬🇧 English</option>
+      </select>
+      <button onclick="endLiveCall()" style="width:60px;height:60px;border-radius:50%;border:none;background:#ef4444;color:#fff;font-size:1.4rem;cursor:pointer;">📵</button>
+    </div>
+  </div>
+  <script>
+    if (window.pdfjsLib) pdfjsLib.GlobalWorkerOptions.workerSrc = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
+    let WORKER_URL = localStorage.getItem("nova_worker_url") || "";
+    let messages = [], sessionId = Date.now().toString(), pendingAttachment = null;
+
+    window.addEventListener("DOMContentLoaded", () => {
+      document.getElementById("workerInput").value = WORKER_URL;
+      updatePill(); renderMem();
+      addBubble("ai", "नमस्ते! मैं **Nova AI** हूँ। आप मुझसे किसी भी भाषा में सवाल पूछें, फोटो बनवाएं, ताज़ा खबर सर्च करें, या `📎` दबाकर **PDF, Word, Excel या फोटो** भेजें — मैं अपने आप सही टूल चलाऊँगा! ✨", "🧠 Universal Brain", false);
+      if (!WORKER_URL) {
+        setTimeout(() => {
+          const u = prompt("अपना Cloudflare Worker लिंक (https://nova-ai-api.....workers.dev) पेस्ट करें:");
+          if (u && u.trim().startsWith("http")) { WORKER_URL = u.trim(); localStorage.setItem("nova_worker_url", WORKER_URL); document.getElementById("workerInput").value = WORKER_URL; updatePill(); }
+        }, 500);
+      }
+    });
+
+    function updatePill() {
+      const p = document.getElementById("connPill");
+      if (WORKER_URL.startsWith("http")) { p.textContent = "● Connected"; p.classList.remove("off"); }
+      else { p.textContent = "● Set URL"; p.classList.add("off"); }
+    }
+    function saveWorker() {
+      const v = document.getElementById("workerInput").value.trim();
+      if (!v.startsWith("http")) return alert("सही https://... लिंक डालें।");
+      WORKER_URL = v; localStorage.setItem("nova_worker_url", WORKER_URL); updatePill(); alert("✅ लिंक सेव हो गया!");
+    }
+    function switchTab(t) {
+      document.querySelectorAll(".view").forEach(v => v.classList.remove("active"));
+      document.querySelectorAll(".nav-b").forEach(b => b.classList.remove("active"));
+      document.getElementById("view-" + t).classList.add("active");
+      document.querySelector(`.nav-b[data-t="${t}"]`).classList.add("active");
+      if (t === "history") renderHistory();
+    }
+    function quickAsk(q) { switchTab("chat"); document.getElementById("chatInput").value = q; sendUniversal(); }
+    function newChat() { messages = []; sessionId = Date.now().toString(); document.getElementById("chatFeed").innerHTML = ""; addBubble("ai", "नई चैट शुरू हो गई है! पूछिए क्या मदद करूँ?", "🧠 Universal Brain", false); }
+
+    // UNIVERSAL FILE ATTACHMENT HANDLER (PDF, DOCX, TXT, CSV, XLSX, IMAGE)
+    async function handleAttachment(ev) {
+      const file = ev.target.files[0]; if (!file) return;
+      const bar = document.getElementById("attBar"), lbl = document.getElementById("attLabel");
+      bar.style.display = "flex"; lbl.textContent = `⏳ "${file.name}" पढ़ा जा रहा है...`;
+      const name = file.name.toLowerCase();
+
+      try {
+        if (file.type.startsWith("image/")) {
+          const reader = new FileReader();
+          reader.onload = () => {
+            const img = new Image();
+            img.onload = () => {
+              const c = document.createElement("canvas");
+              const scale = Math.min(1, 1024 / Math.max(img.width, img.height));
+              c.width = img.width * scale; c.height = img.height * scale;
+              c.getContext("2d").drawImage(img, 0, 0, c.width, c.height);
+              pendingAttachment = { kind: "image", name: file.name, data: c.toDataURL("image/jpeg", 0.85) };
+              lbl.textContent = `🖼️ ${file.name} तैयार है`;
+            };
+            img.src = reader.result;
+          };
+          reader.readAsDataURL(file);
+        } else if (name.endsWith(".pdf")) {
+          const pdf = await pdfjsLib.getDocument({ data: await file.arrayBuffer() }).promise;
+          let txt = "";
+          for (let i = 1; i <= Math.min(pdf.numPages, 25); i++) {
+            const content = await (await pdf.getPage(i)).getTextContent();
+            txt += `\n[Page ${i}]\n` + content.items.map(x => x.str).join(" ");
+          }
+          pendingAttachment = { kind: "document", name: file.name, text: txt };
+          lbl.textContent = `📄 ${file.name} (${pdf.numPages} पेज) तैयार है`;
+        } else if (name.endsWith(".docx")) {
+          const res = await mammoth.extractRawText({ arrayBuffer: await file.arrayBuffer() });
+          pendingAttachment = { kind: "document", name: file.name, text: res.value };
+          lbl.textContent = `📘 ${file.name} (Word) तैयार है`;
+        } else if (name.endsWith(".csv") || name.endsWith(".xlsx") || name.endsWith(".xls")) {
+          const wb = XLSX.read(await file.arrayBuffer(), { type: "array" });
+          const rows = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]]);
+          pendingAttachment = { kind: "document", name: file.name, text: `Spreadsheet (${rows.length} rows):\n${JSON.stringify(rows.slice(0, 60))}` };
+          lbl.textContent = `📊 ${file.name} (${rows.length} rows) तैयार है`;
+        } else {
+          pendingAttachment = { kind: "document", name: file.name, text: await file.text() };
+          lbl.textContent = `📝 ${file.name} तैयार है`;
+        }
+      } catch (e) { lbl.textContent = "⚠️ फाइल पढ़ने में त्रुटि: " + e.message; }
+      ev.target.value = "";
+    }
+
+    function clearAttachment() { pendingAttachment = null; document.getElementById("attBar").style.display = "none"; }
+
+    function mdRender(txt) {
+      if (!window.marked) return txt.replace(/\n/g, "<br>");
+      const div = document.createElement("div"); div.innerHTML = marked.parse(txt);
+      div.querySelectorAll("pre").forEach(pre => {
+        const b = document.createElement("button"); b.className = "copy-code"; b.textContent = "Copy";
+        b.onclick = () => { navigator.clipboard.writeText(pre.innerText.replace(/^Copy\n?/, "")); b.textContent = "Copied!"; };
+        pre.appendChild(b);
+      });
+      return div.innerHTML;
+    }
+
+    function addBubble(role, text, toolTag = "", save = true, extra = {}) {
+      const feed = document.getElementById("chatFeed");
+      const div = document.createElement("div"); div.className = `msg ${role}`;
+      if (role === "ai" && toolTag) {
+        const tag = document.createElement("div"); tag.className = "tool-tag"; tag.textContent = toolTag; div.appendChild(tag);
+      }
+      const body = document.createElement("div");
+      body.innerHTML = role === "ai" ? mdRender(text) : text.replace(/</g, "&lt;");
+      div.appendChild(body);
+
+      if (extra.image) {
+        const img = document.createElement("img"); img.src = extra.image; img.style.cssText = "max-width:100%;border-radius:11px;margin-top:8px;display:block;";
+        const dl = document.createElement("a"); dl.href = extra.image; dl.download = "nova-ai.png"; dl.className = "btn"; dl.style.cssText = "margin-top:7px;text-decoration:none;"; dl.textContent = "⬇️ इमेज डाउनलोड करें";
+        div.appendChild(img); div.appendChild(dl);
+      }
+      if (extra.sources && extra.sources.length) {
+        extra.sources.forEach((s, i) => {
+          const a = document.createElement("a"); a.className = "src-link"; a.href = s.url; a.target = "_blank";
+          a.textContent = `[${i + 1}] ${s.title}`; div.appendChild(a);
+        });
+      }
+      if (extra.fileFormat && extra.filePayload) {
+        const fbtn = document.createElement("button"); fbtn.className = "btn"; fbtn.style.marginTop = "8px";
+        fbtn.textContent = `⬇️ Download ${extra.fileFormat.toUpperCase()} File`;
+        fbtn.onclick = () => downloadGeneratedDoc(extra.fileFormat, extra.filePayload);
+        div.appendChild(fbtn);
+      }
+      if (role === "ai") {
+        const bar = document.createElement("div"); bar.className = "msg-bar";
+        bar.innerHTML = `<button class="chip" onclick="speakText(this.dataset.t)" data-t="${text.replace(/"/g,'&quot;')}">🔊 सुनें</button><button class="chip" onclick="navigator.clipboard.writeText(this.dataset.t);this.textContent='✅ Copied'" data-t="${text.replace(/"/g,'&quot;')}">📋 Copy</button>`;
+        div.appendChild(bar);
+      }
+      feed.appendChild(div); feed.scrollTop = feed.scrollHeight;
+      if (save) { messages.push({ role: role === "ai" ? "assistant" : "user", content: text }); saveHistory(); }
+      return div;
+    }
+
+    async function downloadGeneratedDoc(fmt, payload) {
+      const title = (payload.title || "Nova-Document").slice(0, 22);
+      if (fmt === "pptx" && window.PptxGenJS) {
+        const pptx = new PptxGenJS();
+        (payload.slides || []).forEach(s => {
+          const sl = pptx.addSlide(); sl.background = { color: "0F172A" };
+          sl.addText(s.title || "", { x:0.5, y:0.5, w:9, h:0.8, fontSize:24, bold:true, color:"60A5FA" });
+          sl.addText((s.bullets || []).map(b => "• " + b).join("\n"), { x:0.6, y:1.5, w:8.8, h:4.5, fontSize:16, color:"F1F5F9" });
+        });
+        await pptx.writeFile({ fileName: `${title}.pptx` });
+      } else if (fmt === "xlsx" && window.XLSX) {
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(payload.rows || []), "Nova");
+        XLSX.writeFile(wb, `${title}.xlsx`);
+      } else if (fmt === "pdf" && window.jspdf) {
+        const doc = new window.jspdf.jsPDF();
+        doc.text(doc.splitTextToSize((payload.content || "").replace(/[^\x00-\x7F]/g, " "), 180).slice(0, 45), 14, 18);
+        doc.save(`${title}.pdf`);
+      } else {
+        const a = document.createElement("a");
+        a.href = URL.createObjectURL(new Blob([`<html><body>${mdRender(payload.content || "")}</body></html>`], { type: "application/msword" }));
+        a.download = `${title}.doc`; a.click();
+      }
+    }
+
+    async function sendUniversal() {
+      const inp = document.getElementById("chatInput");
+      const text = inp.value.trim();
+      if (!text && !pendingAttachment) return;
+      if (!WORKER_URL) { alert("पहले Settings में Worker URL डालें।"); return switchTab("settings"); }
+
+      const attToSend = pendingAttachment;
+      clearAttachment();
+      inp.value = "";
+      addBubble("user", attToSend ? `📎 [${attToSend.name}]\n${text}` : text, "", true);
+      const loader = addBubble("ai", "Universal AI Brain काम कर रहा है...", "⏳ Processing", false);
+
+      const mems = JSON.parse(localStorage.getItem("nova_mems") || "[]");
+      const sys = `You are Nova AI, a reliable multilingual AI assistant. ${mems.length ? "User Memory: " + mems.join("; ") : ""} Understand Hindi, English, Hinglish (e.g. 'Prakash ka pravartan' = Reflection of Light), and Bhojpuri accurately. Reply in the user's language.`;
+
+      try {
+        const res = await fetch(WORKER_URL, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ prompt: text, messages: messages.slice(-10), attachment: attToSend, system: sys })
+        });
+        const data = await res.json();
+        loader.remove();
+        addBubble("ai", data.reply || data.error || "कोई जवाब नहीं मिला।", data.tool || "🧠 Universal AI", true, data);
+      } catch (e) { loader.textContent = "⚠️ सर्वर से संपर्क नहीं हो पाया।"; }
+    }
+
+    function saveHistory() {
+      if (!messages.length) return;
+      const all = JSON.parse(localStorage.getItem("nova_chats") || "[]");
+      const title = (messages.find(m => m.role === "user")?.content || "Chat").slice(0, 42);
+      const idx = all.findIndex(x => x.id === sessionId);
+      if (idx >= 0) all[idx] = { id: sessionId, title, messages };
+      else all.unshift({ id: sessionId, title, messages });
+      localStorage.setItem("nova_chats", JSON.stringify(all.slice(0, 20)));
+    }
+    function renderHistory() {
+      const list = document.getElementById("historyList");
+      const all = JSON.parse(localStorage.getItem("nova_chats") || "[]");
+      list.innerHTML = all.length ? "" : "<p style='color:var(--muted);font-size:0.84rem;'>कोई पुरानी चैट सेव नहीं है।</p>";
+      all.forEach(c => {
+        const d = document.createElement("div"); d.className = "card"; d.style.cssText = "display:flex;justify-content:space-between;align-items:center;padding:10px;";
+        d.innerHTML = `<span style="cursor:pointer;font-size:0.86rem;">💬 ${c.title}</span>`;
+        d.querySelector("span").onclick = () => {
+          sessionId = c.id; messages = c.messages; document.getElementById("chatFeed").innerHTML = "";
+          messages.forEach(m => addBubble(m.role === "assistant" ? "ai" : "user", m.content, "", false)); switchTab("chat");
+        };
+        list.appendChild(d);
+      });
+    }
+
+    function addMem() {
+      const inp = document.getElementById("memInput"); if (!inp.value.trim()) return;
+      const l = JSON.parse(localStorage.getItem("nova_mems") || "[]"); l.push(inp.value.trim());
+      localStorage.setItem("nova_mems", JSON.stringify(l)); inp.value = ""; renderMem();
+    }
+    function renderMem() {
+      const wrap = document.getElementById("memList"); wrap.innerHTML = "";
+      JSON.parse(localStorage.getItem("nova_mems") || "[]").forEach((m, i) => {
+        const d = document.createElement("div"); d.style.cssText = "display:flex;justify-content:space-between;background:#0b0e1a;padding:7px 10px;border-radius:8px;font-size:0.8rem;";
+        d.innerHTML = `<span>🧠 ${m}</span><button onclick="const l=JSON.parse(localStorage.getItem('nova_mems')||'[]');l.splice(${i},1);localStorage.setItem('nova_mems',JSON.stringify(l));renderMem();" style="background:none;border:none;color:#f87171;">✕</button>`;
+        wrap.appendChild(d);
+      });
+    }
+
+    // VOICE INPUT, TTS & LIVE CALL
+    function voiceToInput() {
+      const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+      if (!SR) return alert("Chrome का उपयोग करें।");
+      const r = new SR(); r.lang = "hi-IN";
+      r.onresult = e => { document.getElementById("chatInput").value = e.results[0][0].transcript; sendUniversal(); };
+      r.start();
+    }
+    function speakText(raw, onEnd = null) {
+      window.speechSynthesis.cancel();
+      const txt = raw.replace(/[*#_`~>\[\]()]/g, " ").replace(/https?:\/\/\S+/g, "").trim();
+      if (!txt) { if (onEnd) onEnd(); return; }
+      const u = new SpeechSynthesisUtterance(txt); window.curU = u;
+      u.lang = /[\u0900-\u097F]/.test(txt) ? "hi-IN" : "en-IN";
+      u.onend = () => { if (onEnd) onEnd(); }; u.onerror = () => { if (onEnd) onEnd(); };
+      window.speechSynthesis.speak(u);
+    }
+    let inCall = false, callRec = null, callTimer = null, secs = 0;
+    function startLiveCall() {
+      if (!WORKER_URL) return switchTab("settings");
+      const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+      if (!SR) return alert("Live Call के लिए Google Chrome इस्तेमाल करें।");
+      inCall = true; secs = 0; document.getElementById("callOverlay").classList.add("open");
+      clearInterval(callTimer);
+      callTimer = setInterval(() => { secs++; document.getElementById("callTimer").textContent = `${String(Math.floor(secs/60)).padStart(2,"0")}:${String(secs%60).padStart(2,"0")}`; }, 1000);
+      const greet = "हैलो! मैं Nova बोल रहा हूँ। बताइए, क्या बात करनी है?";
+      document.getElementById("callCaps").textContent = greet;
+      speakText(greet, () => { if (inCall) listenCall(); });
+    }
+    function endLiveCall() { inCall = false; window.speechSynthesis.cancel(); clearInterval(callTimer); if (callRec) try { callRec.abort(); } catch (e) {} document.getElementById("callOverlay").classList.remove("open"); }
+    function interruptCall() { window.speechSynthesis.cancel(); if (inCall) listenCall(); }
+    function listenCall() {
+      if (!inCall) return;
+      const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+      const [recL, pLang] = document.getElementById("callLangSel").value.split("|");
+      callRec = new SR(); callRec.lang = recL; let said = "";
+      document.getElementById("callStatus").textContent = "सुन रहा हूँ... बोलिए";
+      callRec.onresult = e => { said = e.results[0][0].transcript; document.getElementById("callCaps").textContent = "आप: " + said; };
+      callRec.onend = async () => {
+        if (!inCall) return;
+        if (!said.trim()) return listenCall();
+        document.getElementById("callStatus").textContent = "Nova सोच रहा है...";
+        const r = await fetch(WORKER_URL, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ prompt: said, system: `Talk live on a phone call in ${pLang}. Keep reply short (1-3 spoken sentences) with no markdown or emojis.` }) });
+        const d = await r.json(); const rep = d.reply || "दोबारा बोलिए।";
+        document.getElementById("callCaps").textContent = rep; document.getElementById("callStatus").textContent = "Nova बोल रहा है...";
+        speakText(rep, () => { if (inCall) listenCall(); });
+      };
+      try { callRec.start(); } catch (e) {}
+    }
+  </script>
+</body>
+</html>
