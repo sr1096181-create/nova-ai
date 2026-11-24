@@ -1,0 +1,1038 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Nova AI – Complete Intelligent Companion</title>
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/pptxgenjs@3.12.0/dist/pptxgen.bundle.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <style>
+    :root {
+      --bg: #080a12; --card: #111526; --card-2: #161c33; --border: #1e2645;
+      --primary: #3b82f6; --secondary: #8b5cf6; --text: #f1f5f9; --muted: #94a3b8;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+    body { background: var(--bg); color: var(--text); height: 100dvh; display: flex; flex-direction: column; overflow: hidden; }
+    header { padding: 10px 14px; background: rgba(17, 21, 38, 0.96); border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; z-index: 20; }
+    .brand { display: flex; align-items: center; gap: 9px; }
+    .logo-badge { width: 34px; height: 34px; border-radius: 10px; background: linear-gradient(135deg, #3b82f6, #8b5cf6); display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 1.1rem; color: #fff; }
+    .brand h1 { font-size: 1.15rem; font-weight: 800; background: linear-gradient(90deg, #60a5fa, #a78bfa); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .brand p { font-size: 0.68rem; color: var(--muted); }
+    .header-actions { display: flex; align-items: center; gap: 7px; }
+    .status-pill { font-size: 0.68rem; padding: 4px 8px; border-radius: 999px; background: rgba(16, 185, 129, 0.14); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.35); }
+    .status-pill.offline { background: rgba(239, 68, 68, 0.14); color: #f87171; border-color: rgba(239, 68, 68, 0.35); }
+    .call-btn-top { background: linear-gradient(135deg, #10b981, #059669); color: #fff; border: none; padding: 6px 11px; border-radius: 999px; font-size: 0.76rem; font-weight: 700; cursor: pointer; }
+    main { flex: 1; overflow-y: auto; position: relative; }
+    .view { display: none; height: 100%; flex-direction: column; }
+    .view.active { display: flex; }
+    .scroll-pad { padding: 14px; overflow-y: auto; display: flex; flex-direction: column; gap: 13px; }
+    .card { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 13px; }
+    .hero-call-card { background: linear-gradient(135deg, rgba(16, 185, 129, 0.2), rgba(59, 130, 246, 0.24)); border: 1px solid rgba(16, 185, 129, 0.45); border-radius: 16px; padding: 15px; display: flex; align-items: center; justify-content: space-between; gap: 12px; cursor: pointer; }
+    .hero-call-card h2 { font-size: 1rem; margin-bottom: 3px; }
+    .hero-call-card p { font-size: 0.76rem; color: #cbd5e1; line-height: 1.35; }
+    .call-orb-btn { width: 48px; height: 48px; border-radius: 50%; flex-shrink: 0; background: linear-gradient(135deg, #10b981, #059669); display: flex; align-items: center; justify-content: center; font-size: 1.3rem; }
+    .sec-title { font-size: 0.78rem; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; }
+    .grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 9px; }
+    .tool-tile { background: var(--card); border: 1px solid var(--border); border-radius: 13px; padding: 12px 10px; cursor: pointer; }
+    .tool-tile:active { transform: scale(0.97); border-color: var(--primary); }
+    .tool-tile .ico { font-size: 1.35rem; margin-bottom: 5px; }
+    .tool-tile h3 { font-size: 0.84rem; margin-bottom: 2px; }
+    .tool-tile p { font-size: 0.69rem; color: var(--muted); line-height: 1.25; }
+    input, textarea, select { width: 100%; background: #0b0e1a; border: 1px solid var(--border); color: var(--text); padding: 10px 12px; border-radius: 11px; font-size: 0.88rem; outline: none; }
+    .btn { background: linear-gradient(135deg, #3b82f6, #8b5cf6); color: #fff; border: none; padding: 10px 14px; border-radius: 11px; font-size: 0.86rem; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 6px; }
+    .btn-sm { padding: 6px 10px; font-size: 0.75rem; border-radius: 8px; }
+    .btn-ghost { background: var(--card-2); border: 1px solid var(--border); color: var(--text); }
+    .btn-danger { background: rgba(239, 68, 68, 0.18); border: 1px solid rgba(239, 68, 68, 0.4); color: #fca5a5; }
+    .btn-row { display: flex; flex-wrap: wrap; gap: 7px; }
+    .chat-bar-top { padding: 7px 12px; background: rgba(17, 21, 38, 0.85); border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; gap: 6px; flex-wrap: wrap; }
+    .chat-bar-top select { width: auto; padding: 4px 8px; font-size: 0.74rem; border-radius: 8px; }
+    .chat-feed { flex: 1; padding: 12px; overflow-y: auto; display: flex; flex-direction: column; gap: 11px; }
+    .msg { max-width: 88%; padding: 11px 13px; border-radius: 15px; font-size: 0.9rem; line-height: 1.52; word-wrap: break-word; }
+    .msg.ai { align-self: flex-start; background: var(--card); border: 1px solid var(--border); border-bottom-left-radius: 4px; }
+    .msg.user { align-self: flex-end; background: linear-gradient(135deg, #3b82f6, #7c3aed); color: #fff; border-bottom-right-radius: 4px; }
+    .msg pre { background: #06080f; border: 1px solid #263056; border-radius: 10px; padding: 10px; overflow-x: auto; margin: 8px 0; position: relative; font-size: 0.8rem; }
+    .code-copy-btn { position: absolute; top: 6px; right: 6px; background: #1e293b; color: #93c5fd; border: 1px solid #334155; padding: 2px 7px; border-radius: 6px; font-size: 0.68rem; cursor: pointer; }
+    .msg-tools { margin-top: 8px; display: flex; flex-wrap: wrap; gap: 6px; border-top: 1px solid rgba(255,255,255,0.06); padding-top: 6px; }
+    .chip-btn { background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1); color: #cbd5e1; padding: 3px 8px; border-radius: 7px; font-size: 0.7rem; cursor: pointer; }
+    .followup-wrap { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 4px; }
+    .followup-chip { background: rgba(59, 130, 246, 0.14); border: 1px solid rgba(59, 130, 246, 0.35); color: #93c5fd; padding: 5px 10px; border-radius: 999px; font-size: 0.75rem; cursor: pointer; }
+    .chat-composer { padding: 8px 10px; background: var(--card); border-top: 1px solid var(--border); display: flex; gap: 7px; align-items: center; }
+    .chat-composer input { border-radius: 999px; padding: 10px 14px; }
+    .round-btn { width: 40px; height: 40px; border-radius: 50%; border: none; background: var(--card-2); color: #fff; font-size: 1.05rem; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .round-btn.send { background: linear-gradient(135deg, #3b82f6, #8b5cf6); }
+    .round-btn.stop { background: #ef4444; display: none; }
+    .studio-pills { display: flex; gap: 6px; overflow-x: auto; padding: 9px 12px; background: #0c0f1d; border-bottom: 1px solid var(--border); flex-shrink: 0; }
+    .studio-pills::-webkit-scrollbar { display: none; }
+    .s-pill { white-space: nowrap; padding: 6px 11px; border-radius: 999px; background: var(--card); border: 1px solid var(--border); color: var(--muted); font-size: 0.76rem; font-weight: 600; cursor: pointer; }
+    .s-pill.active { background: linear-gradient(135deg, #3b82f6, #8b5cf6); color: #fff; border-color: transparent; }
+    .studio-pane { display: none; flex: 1; overflow-y: auto; padding: 14px; flex-direction: column; gap: 12px; }
+    .studio-pane.active { display: flex; }
+    .ai-output-box { background: var(--card); border: 1px solid var(--border); border-radius: 13px; padding: 13px; font-size: 0.88rem; line-height: 1.55; white-space: pre-wrap; }
+    .source-card { display: block; background: #0d1224; border: 1px solid #243056; padding: 9px 11px; border-radius: 10px; text-decoration: none; color: #93c5fd; margin-bottom: 7px; }
+    .source-card small { display: block; color: var(--muted); font-size: 0.7rem; margin-top: 2px; word-break: break-all; }
+    .mcq-card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 12px; margin-bottom: 10px; }
+    .mcq-opt { display: block; width: 100%; text-align: left; margin-top: 6px; padding: 8px 10px; background: #0c1020; border: 1px solid var(--border); border-radius: 8px; color: var(--text); font-size: 0.84rem; cursor: pointer; }
+    .mcq-opt.correct { background: rgba(16, 185, 129, 0.22); border-color: #10b981; color: #6ee7b7; }
+    .mcq-opt.wrong { background: rgba(239, 68, 68, 0.22); border-color: #ef4444; color: #fca5a5; }
+    nav { display: flex; background: #0b0e1a; border-top: 1px solid var(--border); padding: 6px 0 8px; }
+    .nav-btn { flex: 1; background: none; border: none; color: var(--muted); display: flex; flex-direction: column; align-items: center; gap: 2px; font-size: 0.68rem; cursor: pointer; }
+    .nav-btn.active { color: #60a5fa; font-weight: 700; }
+    .nav-btn span.ico { font-size: 1.15rem; }
+    #callOverlay { position: fixed; inset: 0; background: linear-gradient(180deg, #0b132b 0%, #090d16 55%, #05070c 100%); z-index: 200; display: none; flex-direction: column; justify-content: space-between; align-items: center; padding: 32px 20px 38px; text-align: center; }
+    #callOverlay.open { display: flex; }
+    .avatar-ring-wrap { position: relative; width: 150px; height: 150px; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+    .pulse-ring { position: absolute; inset: 0; border-radius: 50%; border: 2px solid rgba(56, 189, 248, 0.5); opacity: 0; }
+    .avatar-core { width: 112px; height: 112px; border-radius: 50%; background: linear-gradient(135deg, #2563eb, #7c3aed); display: flex; align-items: center; justify-content: center; font-size: 2.5rem; font-weight: 800; color: #fff; z-index: 2; }
+    .avatar-ring-wrap.ringing .pulse-ring, .avatar-ring-wrap.listening .pulse-ring { animation: ripple 1.5s infinite ease-out; }
+    .avatar-ring-wrap.speaking .avatar-core { animation: bounce 0.45s infinite alternate; }
+    @keyframes ripple { 0% { transform: scale(0.8); opacity: 0.9; } 100% { transform: scale(1.35); opacity: 0; } }
+    @keyframes bounce { 0% { transform: scale(0.97); } 100% { transform: scale(1.09); } }
+    .call-captions { width: 94%; max-height: 110px; overflow-y: auto; font-size: 0.88rem; background: rgba(15, 23, 42, 0.7); border: 1px solid rgba(148, 163, 184, 0.2); padding: 10px 14px; border-radius: 13px; }
+    .dial-circle { width: 54px; height: 54px; border-radius: 50%; background: rgba(255,255,255,0.12); display: flex; align-items: center; justify-content: center; font-size: 1.3rem; color: #fff; }
+    .hangup-btn { width: 64px; height: 64px; border-radius: 50%; border: none; background: #ef4444; color: #fff; font-size: 1.5rem; cursor: pointer; transform: rotate(135deg); }
+    #langModal { position: fixed; inset: 0; background: rgba(2,6,23,0.8); z-index: 300; display: none; align-items: flex-end; justify-content: center; }
+    #langModal.open { display: flex; }
+    .lang-sheet { width: 100%; max-width: 480px; max-height: 75dvh; background: #11162b; border-top-left-radius: 20px; border-top-right-radius: 20px; padding: 16px; display: flex; flex-direction: column; gap: 10px; }
+    .lang-grid { overflow-y: auto; display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
+    .lang-opt { background: #18203c; border: 1px solid #263159; color: #e2e8f0; padding: 10px; border-radius: 10px; text-align: left; font-size: 0.82rem; font-weight: 600; cursor: pointer; }
+    .lang-opt.selected { background: linear-gradient(135deg, #2563eb, #7c3aed); color: #fff; }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="brand">
+      <div class="logo-badge">N</div>
+      <div><h1>Nova AI</h1><p>Your Intelligent Companion</p></div>
+    </div>
+    <div class="header-actions">
+      <div id="connBadge" class="status-pill">● Connected</div>
+      <button class="call-btn-top" onclick="startPhoneCall()">📞 Live Call</button>
+    </div>
+  </header>
+
+  <main>
+    <section id="view-home" class="view active">
+      <div class="scroll-pad">
+        <div class="hero-call-card" onclick="startPhoneCall()">
+          <div><h2>📞 Nova Live Multilingual Call</h2><p>हिन्दी, भोजपुरी, मैथिली, English, বাংলা, मराठी, தமிழ் समेत 18 भाषाओं में लाइव कॉल पर बात करें!</p></div>
+          <div class="call-orb-btn">📞</div>
+        </div>
+        <div class="sec-title">All 16 Nova AI Capabilities</div>
+        <div class="grid-2">
+          <div class="tool-tile" onclick="switchTab('chat')"><div class="ico">💬</div><h3>1. Advanced AI Chat</h3><p>Short/Long, Edit, Regenerate & Share</p></div>
+          <div class="tool-tile" onclick="startPhoneCall()"><div class="ico">🎙️</div><h3>2. Live Voice AI</h3><p>Hands-free कॉल व Speech-to-Text</p></div>
+          <div class="tool-tile" onclick="openStudio('image')"><div class="ico">🎨</div><h3>3. Image & Vision AI</h3><p>फोटो बनाएं, Diagram/Chart समझें</p></div>
+          <div class="tool-tile" onclick="openStudio('pdf')"><div class="ico">📄</div><h3>4. PDF Assistant</h3><p>PDF पढ़ें, Notes, MCQs व Summary</p></div>
+          <div class="tool-tile" onclick="openStudio('study')"><div class="ico">📚</div><h3>5. Study AI & Quiz</h3><p>Physics, Maths, 4-Option MCQ Test</p></div>
+          <div class="tool-tile" onclick="openStudio('search')"><div class="ico">🌐</div><h3>6-7. Search & Research</h3><p>लाइव सोर्स लिंक, Citations व रिपोर्ट</p></div>
+          <div class="tool-tile" onclick="openStudio('coding')"><div class="ico">💻</div><h3>8. Coding AI</h3><p>HTML/Python कोड, Debug व Preview</p></div>
+          <div class="tool-tile" onclick="openStudio('data')"><div class="ico">📊</div><h3>10. Data Analysis</h3><p>CSV/Excel अपलोड, Chart व रिपोर्ट</p></div>
+          <div class="tool-tile" onclick="openStudio('docs')"><div class="ico">📑</div><h3>11. PPT & Doc Creator</h3><p>असली PPTX, Word, Excel, PDF बनाएं</p></div>
+          <div class="tool-tile" onclick="openStudio('writing')"><div class="ico">✍️</div><h3>12-13. Writer & Translate</h3><p>YouTube Script, Email व अनुवाद</p></div>
+          <div class="tool-tile" onclick="switchTab('projects')"><div class="ico">📁</div><h3>14-15. Projects & Tasks</h3><p>अलग प्रोजेक्ट फोल्डर व रिमाइंडर अलार्म</p></div>
+          <div class="tool-tile" onclick="switchTab('settings')"><div class="ico">🧠</div><h3>9 & 16. Memory & Persona</h3><p>AI मेमोरी कंट्रोल व कस्टम निर्देश</p></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="view-chat" class="view">
+      <div class="chat-bar-top">
+        <div style="display:flex;gap:5px;align-items:center;">
+          <select id="personaSelect"><option value="general">🤖 General AI</option><option value="study">📚 Study Tutor</option><option value="coding">💻 Coding Expert</option><option value="writing">✍️ Writing Pro</option><option value="research">🔬 Researcher</option></select>
+          <select id="lengthSelect"><option value="balanced">⚖️ Normal</option><option value="short">⚡ Short</option><option value="long">📖 Detailed</option></select>
+        </div>
+        <div style="display:flex;gap:5px;align-items:center;">
+          <span id="activeProjBadge" style="font-size:0.7rem;color:#93c5fd;"></span>
+          <button class="btn btn-sm btn-ghost" onclick="newChat()">+ New</button>
+        </div>
+      </div>
+      <div id="chatFeed" class="chat-feed"></div>
+      <div class="chat-composer">
+        <button class="round-btn" onclick="voiceToChat()" title="Mic Input">🎤</button>
+        <input id="chatInput" type="text" placeholder="हिंदी, English या किसी भी भाषा में पूछें..." onkeydown="if(event.key==='Enter') sendChat()" />
+        <button id="sendBtn" class="round-btn send" onclick="sendChat()">➤</button>
+        <button id="stopBtn" class="round-btn stop" onclick="stopGenerating()">⏹️</button>
+      </div>
+    </section>
+        <section id="view-studio" class="view">
+      <div class="studio-pills">
+        <button class="s-pill active" data-pane="image" onclick="openStudio('image')">🎨 Image & Vision</button>
+        <button class="s-pill" data-pane="pdf" onclick="openStudio('pdf')">📄 PDF AI</button>
+        <button class="s-pill" data-pane="study" onclick="openStudio('study')">📚 Study & MCQ</button>
+        <button class="s-pill" data-pane="search" onclick="openStudio('search')">🌐 Search & Research</button>
+        <button class="s-pill" data-pane="coding" onclick="openStudio('coding')">💻 Coding AI</button>
+        <button class="s-pill" data-pane="data" onclick="openStudio('data')">📊 Data & Charts</button>
+        <button class="s-pill" data-pane="docs" onclick="openStudio('docs')">📑 PPT / Word / Excel</button>
+        <button class="s-pill" data-pane="writing" onclick="openStudio('writing')">✍️ Writer</button>
+        <button class="s-pill" data-pane="translate" onclick="openStudio('translate')">🌐 Translator</button>
+      </div>
+
+      <div id="pane-image" class="studio-pane active">
+        <div class="card" style="display:flex;flex-direction:column;gap:10px;">
+          <h3>🎨 Text-to-Image Generator</h3>
+          <textarea id="imgGenPrompt" rows="2" placeholder="फोटो का विवरण लिखें (उदाहरण: Solar system planets in space, 4k realistic)..."></textarea>
+          <button class="btn" onclick="runImageGen()">✨ नई फोटो बनाएं</button>
+          <div id="imgGenOut" style="text-align:center;color:var(--muted);font-size:0.82rem;"></div>
+        </div>
+        <div class="card" style="display:flex;flex-direction:column;gap:10px;">
+          <h3>👁️ Upload Image, Diagram & Chart Analyzer + Enhancer</h3>
+          <input type="file" id="visionFileInput" accept="image/*" onchange="previewVisionImage(event)" />
+          <div id="visionPreviewWrap" style="display:none;flex-direction:column;gap:8px;">
+            <img id="visionPreviewImg" style="max-width:100%;max-height:220px;object-fit:contain;border-radius:10px;background:#000;" />
+            <div style="display:flex;gap:8px;align-items:center;font-size:0.75rem;">
+              <span>Brightness:</span><input type="range" id="imgBright" min="60" max="150" value="100" oninput="applyCanvasFilter()" />
+              <span>Contrast:</span><input type="range" id="imgContrast" min="60" max="160" value="100" oninput="applyCanvasFilter()" />
+            </div>
+            <button class="btn btn-sm btn-ghost" onclick="downloadEnhancedImg()">⬇️ Enhanced फोटो सेव करें</button>
+          </div>
+          <input id="visionPrompt" type="text" placeholder="पूछें: इस Diagram/Chart या फोटो में क्या है?" />
+          <button class="btn" onclick="runVisionAnalyze()">🔍 फोटो / डायग्राम समझें</button>
+          <div id="visionOut" class="ai-output-box" style="display:none;"></div>
+        </div>
+      </div>
+
+      <div id="pane-pdf" class="studio-pane">
+        <div class="card" style="display:flex;flex-direction:column;gap:10px;">
+          <h3>📄 Real PDF Assistant</h3>
+          <input type="file" id="pdfUploadInput" accept="application/pdf" onchange="handlePdfUpload(event)" />
+          <div id="pdfStatus" style="font-size:0.8rem;color:#34d399;">कोई PDF चुनें — पूरा टेक्स्ट अपने आप पढ़ा जाएगा।</div>
+          <div class="btn-row">
+            <button class="btn btn-sm" onclick="runPdfAction('summary')">📝 Summary</button>
+            <button class="btn btn-sm" onclick="runPdfAction('notes')">📚 Chapter Notes</button>
+            <button class="btn btn-sm" onclick="runPdfAction('questions')">❓ Imp Questions</button>
+            <button class="btn btn-sm" onclick="runPdfAction('mcqs')">✅ Generate MCQs</button>
+            <button class="btn btn-sm" onclick="runPdfAction('explain')">💡 Difficult Topics</button>
+          </div>
+          <div style="display:flex;gap:6px;">
+            <input id="pdfCustomQ" type="text" placeholder="इस PDF से जुड़ा कोई सवाल पूछें..." />
+            <button class="btn btn-sm" onclick="runPdfAction('custom')">पूछें</button>
+          </div>
+        </div>
+        <div id="pdfOutBox" class="ai-output-box" style="display:none;"></div>
+        <button id="pdfDownloadBtn" class="btn btn-ghost" style="display:none;" onclick="downloadTextFile('Nova-PDF-Notes.txt', document.getElementById('pdfOutBox').innerText)">⬇️ Generated Notes डाउनलोड करें</button>
+      </div>
+
+      <div id="pane-study" class="studio-pane">
+        <div class="card" style="display:flex;flex-direction:column;gap:10px;">
+          <h3>📚 Study AI (Class 10/12 & Competitive)</h3>
+          <div style="display:flex;gap:8px;">
+            <select id="studySubject"><option>Physics</option><option>Chemistry</option><option>Mathematics</option><option>Biology</option><option>English</option><option>Hindi</option></select>
+            <select id="studyLevel"><option value="Basic to Advanced">Basic → Advanced</option><option value="Class 10 Board">Class 10 Board</option><option value="Class 12 Board">Class 12 Board</option><option value="NDA / Competitive">NDA / Exam Level</option></select>
+          </div>
+          <input id="studyTopicInput" type="text" placeholder="टॉपिक या सवाल लिखें (जैसे: प्रकाश का परावर्तन, Trigonometry, Photosynthesis)..." />
+          <div class="btn-row">
+            <button class="btn btn-sm" onclick="runStudyMode('explain')">📖 Concept Explain</button>
+            <button class="btn btn-sm" onclick="runStudyMode('steps')">🧮 Step-by-Step Solve</button>
+            <button class="btn btn-sm" onclick="runStudyMode('mcq')">🎯 4-Option MCQ Test</button>
+            <button class="btn btn-sm" onclick="runStudyMode('notes')">🗒️ Revision Notes</button>
+            <button class="btn btn-sm" onclick="runStudyMode('plan')">📅 Study Plan</button>
+          </div>
+        </div>
+        <div id="studyOutBox" class="ai-output-box" style="display:none;"></div>
+        <div id="mcqQuizContainer"></div>
+      </div>
+
+      <div id="pane-search" class="studio-pane">
+        <div class="card" style="display:flex;flex-direction:column;gap:10px;">
+          <h3>🌐 Live Web Search & Deep Research</h3>
+          <input id="searchQueryInput" type="text" placeholder="खोजने या रिसर्च करने के लिए विषय लिखें..." />
+          <div class="btn-row">
+            <button class="btn" style="flex:1;" onclick="runWebSearch('search')">🔍 Web Search (Sources)</button>
+            <button class="btn btn-ghost" style="flex:1;" onclick="runWebSearch('research')">📑 Deep Research Report</button>
+          </div>
+        </div>
+        <div id="searchSourcesList"></div>
+        <div id="searchOutBox" class="ai-output-box" style="display:none;"></div>
+      </div>
+
+      <div id="pane-coding" class="studio-pane">
+        <div class="card" style="display:flex;flex-direction:column;gap:10px;">
+          <h3>💻 Coding AI Studio</h3>
+          <select id="codeLangSelect"><option>HTML / CSS / JavaScript</option><option>Python</option><option>JavaScript (Node/React)</option><option>C++ / Java</option><option>SQL</option></select>
+          <textarea id="codePromptInput" rows="4" placeholder="कोड बनवाएं या अपना एरर वाला कोड यहाँ पेस्ट करें..."></textarea>
+          <div class="btn-row">
+            <button class="btn btn-sm" onclick="runCodingAI('generate')">⚡ Generate Code</button>
+            <button class="btn btn-sm" onclick="runCodingAI('explain')">📖 Explain Step-by-Step</button>
+            <button class="btn btn-sm" onclick="runCodingAI('debug')">🐞 Debug & Fix Error</button>
+          </div>
+        </div>
+        <div id="codingOutBox" class="ai-output-box" style="display:none;"></div>
+        <iframe id="htmlLivePreview" style="display:none;width:100%;height:260px;background:#fff;border-radius:12px;border:1px solid var(--border);"></iframe>
+      </div>
+
+      <div id="pane-data" class="studio-pane">
+        <div class="card" style="display:flex;flex-direction:column;gap:10px;">
+          <h3>📊 CSV & Excel Data Analysis</h3>
+          <input type="file" id="dataFileInput" accept=".csv,.xlsx,.xls" onchange="handleDataFile(event)" />
+          <div id="dataSummaryStats" style="font-size:0.8rem;color:#34d399;">CSV या Excel (.xlsx) फाइल अपलोड करें।</div>
+          <canvas id="dataChartCanvas" style="display:none;max-height:220px;background:#0b0e1a;border-radius:10px;padding:8px;"></canvas>
+          <button class="btn" onclick="analyzeUploadedData()">🧠 AI से डेटा व कैलकुलेशन समझें</button>
+        </div>
+        <div id="dataOutBox" class="ai-output-box" style="display:none;"></div>
+      </div>
+
+      <div id="pane-docs" class="studio-pane">
+        <div class="card" style="display:flex;flex-direction:column;gap:10px;">
+          <h3>📑 Real PPT, Word, Excel & PDF Creator</h3>
+          <input id="docTopicInput" type="text" placeholder="विषय लिखें (जैसे: Photosynthesis Class 10, Monthly Expense Sheet)..." />
+          <select id="docLangSelect"><option value="Hindi & English">Hindi + English</option><option value="Hindi">Pure Hindi</option><option value="English">English</option></select>
+          <div class="grid-2">
+            <button class="btn btn-sm" onclick="createRealFile('pptx')">📽️ Download PPT (.pptx)</button>
+            <button class="btn btn-sm" onclick="createRealFile('docx')">📘 Download Word (.doc)</button>
+            <button class="btn btn-sm" onclick="createRealFile('xlsx')">📗 Download Excel (.xlsx)</button>
+            <button class="btn btn-sm" onclick="createRealFile('pdf')">📕 Download PDF (.pdf)</button>
+          </div>
+          <div id="docStatusBox" style="font-size:0.82rem;color:#93c5fd;"></div>
+        </div>
+      </div>
+
+      <div id="pane-writing" class="studio-pane">
+        <div class="card" style="display:flex;flex-direction:column;gap:10px;">
+          <h3>✍️ AI Writing Assistant</h3>
+          <div style="display:flex;gap:8px;">
+            <select id="writeType"><option value="YouTube Title, Description & Tags">YouTube Title & Desc</option><option value="Engaging Video Script">YouTube Video Script</option><option value="Detailed Article / Blog">Article / Essay</option><option value="Professional Email / Application">Email / Application</option><option value="Rewrite & Improve Clarity">Rewrite & Improve</option><option value="Fix Grammar & Spelling">Grammar Correction</option><option value="Concise Summary">Summarization</option></select>
+            <select id="writeTone"><option>Educational & Clear</option><option>Engaging & Viral</option><option>Formal & Professional</option><option>Simple Hindi</option></select>
+          </div>
+          <textarea id="writeInput" rows="4" placeholder="अपना विषय या टेक्स्ट यहाँ लिखें..."></textarea>
+          <button class="btn" onclick="runWritingAI()">✨ लिखें (Generate)</button>
+        </div>
+        <div id="writeOutBox" class="ai-output-box" style="display:none;"></div>
+      </div>
+
+      <div id="pane-translate" class="studio-pane">
+        <div class="card" style="display:flex;flex-direction:column;gap:10px;">
+          <h3>🌐 Smart Multilingual Translator</h3>
+          <div style="display:flex;gap:6px;align-items:center;">
+            <select id="transFrom"><option value="Auto Detect">Auto Detect</option><option value="Hindi">Hindi (हिन्दी)</option><option value="English">English</option><option value="Bhojpuri">Bhojpuri (भोजपुरी)</option><option value="Bengali">Bengali</option><option value="Marathi">Marathi</option><option value="Tamil">Tamil</option><option value="Urdu">Urdu</option></select>
+            <button class="btn btn-sm btn-ghost" onclick="swapTransLangs()">⇄</button>
+            <select id="transTo"><option value="Hindi">Hindi (हिन्दी)</option><option value="English" selected>English</option><option value="Bhojpuri">Bhojpuri (भोजपुरी)</option><option value="Bengali">Bengali</option><option value="Marathi">Marathi</option><option value="Tamil">Tamil</option><option value="Urdu">Urdu</option></select>
+          </div>
+          <textarea id="transSourceText" rows="3" placeholder="अनुवाद करने के लिए टेक्स्ट लिखें..."></textarea>
+          <div class="btn-row">
+            <button class="btn" style="flex:1;" onclick="runTranslator()">🌐 अनुवाद करें</button>
+            <button class="btn btn-ghost" onclick="document.getElementById('transSourceText').value='';document.getElementById('transResultBox').style.display='none';">Clear</button>
+          </div>
+        </div>
+        <div id="transResultBox" class="ai-output-box" style="display:none;"></div>
+        <div id="transActions" class="btn-row" style="display:none;">
+          <button class="btn btn-sm btn-ghost" onclick="navigator.clipboard.writeText(document.getElementById('transResultBox').innerText)">📋 Copy</button>
+          <button class="btn btn-sm btn-ghost" onclick="speakSentences(document.getElementById('transResultBox').innerText)">🔊 सुनें</button>
+        </div>
+      </div>
+    </section>
+
+    <section id="view-projects" class="view">
+      <div class="scroll-pad">
+        <div class="card" style="display:flex;flex-direction:column;gap:10px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;"><h3>📁 My Projects</h3><button class="btn btn-sm" onclick="createNewProject()">+ New Project</button></div>
+          <input id="projectSearchInput" type="text" placeholder="🔍 प्रोजेक्ट या पुरानी चैट खोजें..." oninput="renderProjects()" />
+          <div id="projectsList" style="display:flex;flex-direction:column;gap:8px;"></div>
+        </div>
+        <div class="card" style="display:flex;flex-direction:column;gap:10px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;"><h3>⏰ Reminders & Study Tasks</h3><button class="btn btn-sm btn-ghost" onclick="requestNotifPerm()">🔔 Allow Alerts</button></div>
+          <input id="taskTitleInput" type="text" placeholder="टास्क या रिमाइंडर लिखें (जैसे: NDA Maths Revision)..." />
+          <div style="display:flex;gap:8px;"><input id="taskDateInput" type="date" /><input id="taskTimeInput" type="time" /></div>
+          <button class="btn" onclick="addTaskReminder()">➕ रिमाइंडर सेट करें</button>
+          <div id="tasksList" style="display:flex;flex-direction:column;gap:8px;"></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="view-settings" class="view">
+      <div class="scroll-pad">
+        <div class="card" style="display:flex;flex-direction:column;gap:10px;">
+          <h3>🔌 Server Connection</h3>
+          <label style="font-size:0.78rem;color:var(--muted);">Cloudflare Worker Backend URL:</label>
+          <input id="workerUrlInput" type="url" placeholder="https://nova-ai-api.yourname.workers.dev" />
+          <button class="btn" onclick="saveWorkerUrl()">💾 Save URL</button>
+        </div>
+        <div class="card" style="display:flex;flex-direction:column;gap:10px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;">
+            <h3>🧠 AI Memory Control</h3>
+            <label style="display:flex;align-items:center;gap:6px;font-size:0.82rem;cursor:pointer;"><input type="checkbox" id="memoryToggle" style="width:auto;" checked onchange="toggleMemorySetting()" /> Active</label>
+          </div>
+          <div style="display:flex;gap:6px;"><input id="newMemoryInput" type="text" placeholder="जैसे: मैं Class 12 और NDA की तैयारी कर रहा हूँ..." /><button class="btn btn-sm" onclick="addMemoryFact()">Add</button></div>
+          <div id="memoryList" style="display:flex;flex-direction:column;gap:6px;"></div>
+        </div>
+        <div class="card" style="display:flex;flex-direction:column;gap:10px;">
+          <h3>🎛️ Custom Assistant Instructions</h3>
+          <textarea id="customInstrInput" rows="3" placeholder="Nova AI को निर्देश दें कि वह आपसे कैसे बात करे..."></textarea>
+          <button class="btn btn-ghost" onclick="saveCustomInstructions()">💾 Save Instructions</button>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <nav>
+    <button class="nav-btn active" data-tab="home" onclick="switchTab('home')"><span class="ico">🏠</span>Home</button>
+    <button class="nav-btn" data-tab="chat" onclick="switchTab('chat')"><span class="ico">💬</span>Chat</button>
+    <button class="nav-btn" data-tab="studio" onclick="switchTab('studio')"><span class="ico">🧰</span>All Tools</button>
+    <button class="nav-btn" data-tab="projects" onclick="switchTab('projects')"><span class="ico">📁</span>Projects</button>
+    <button class="nav-btn" data-tab="settings" onclick="switchTab('settings')"><span class="ico">⚙️</span>Settings</button>
+  </nav>
+
+  <div id="callOverlay">
+    <div>
+      <div style="font-size:0.72rem;color:#64748b;">🔒 NOVA MULTILINGUAL HD CALL</div>
+      <div style="font-size:1.75rem;font-weight:800;margin-top:4px;">Nova AI</div>
+      <div id="callTimer" style="font-size:1rem;font-weight:600;color:#34d399;margin-top:2px;">Calling...</div>
+    </div>
+    <div style="display:flex;flex-direction:column;align-items:center;gap:16px;width:100%;">
+      <div id="avatarWrap" class="avatar-ring-wrap ringing" onclick="interruptCallSpeech()"><div class="pulse-ring"></div><div class="avatar-core">N</div></div>
+      <div id="callStatusPill" style="background:rgba(255,255,255,0.08);padding:6px 14px;border-radius:999px;font-size:0.84rem;">रिंग हो रही है...</div>
+      <div id="callCaptions" class="call-captions">कॉल जुड़ रही है...</div>
+    </div>
+    <div style="width:100%;max-width:330px;display:flex;flex-direction:column;align-items:center;gap:22px;">
+      <div style="width:100%;display:flex;justify-content:space-around;">
+        <button id="btnMute" onclick="toggleCallMute()" style="background:none;border:none;color:#cbd5e1;font-size:0.74rem;display:flex;flex-direction:column;align-items:center;gap:5px;cursor:pointer;"><div class="dial-circle">🎙️</div><span>Mute</span></button>
+        <button onclick="openLangModal()" style="background:none;border:none;color:#cbd5e1;font-size:0.74rem;display:flex;flex-direction:column;align-items:center;gap:5px;cursor:pointer;"><div class="dial-circle">🌐</div><span id="callLangText">Auto / हिन्दी</span></button>
+      </div>
+      <button class="hangup-btn" onclick="endPhoneCall()">📞</button>
+    </div>
+  </div>
+
+  <div id="langModal" onclick="if(event.target===this) closeLangModal()">
+    <div class="lang-sheet">
+      <div style="display:flex;justify-content:space-between;align-items:center;"><strong>🌐 कॉल की भाषा चुनें</strong><button class="btn btn-sm btn-ghost" onclick="closeLangModal()">✕</button></div>
+      <div id="langGrid" class="lang-grid"></div>
+    </div>
+        </div>
+  
+  <script>
+    if (window.pdfjsLib) pdfjsLib.GlobalWorkerOptions.workerSrc = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
+    let WORKER_URL = localStorage.getItem("nova_worker_url") || "";
+    let chatHistory = [];
+    let currentAbortController = null;
+    let activeProjectId = localStorage.getItem("nova_active_project") || "default";
+
+    window.addEventListener("DOMContentLoaded", () => {
+      document.getElementById("workerUrlInput").value = WORKER_URL;
+      document.getElementById("memoryToggle").checked = localStorage.getItem("nova_mem_enabled") !== "false";
+      document.getElementById("customInstrInput").value = localStorage.getItem("nova_custom_instr") || "";
+      updateConnBadge(); renderMemoryList(); renderProjects(); renderTasks(); loadActiveProjectChat();
+      if (!WORKER_URL) {
+        setTimeout(() => {
+          const u = prompt("अपना Cloudflare Worker लिंक (https://nova-ai-api.....workers.dev) पेस्ट करें:");
+          if (u && u.trim().startsWith("http")) {
+            WORKER_URL = u.trim(); localStorage.setItem("nova_worker_url", WORKER_URL);
+            document.getElementById("workerUrlInput").value = WORKER_URL; updateConnBadge();
+          }
+        }, 500);
+      }
+      setInterval(checkDueReminders, 30000);
+    });
+
+    function updateConnBadge() {
+      const b = document.getElementById("connBadge");
+      if (WORKER_URL && WORKER_URL.startsWith("http")) { b.textContent = "● Connected"; b.classList.remove("offline"); }
+      else { b.textContent = "● Set URL"; b.classList.add("offline"); }
+    }
+
+    function saveWorkerUrl() {
+      const val = document.getElementById("workerUrlInput").value.trim();
+      if (!val.startsWith("http")) return alert("सही https://... लिंक डालें।");
+      WORKER_URL = val; localStorage.setItem("nova_worker_url", WORKER_URL); updateConnBadge();
+      alert("✅ Cloudflare Worker लिंक सेव हो गया!");
+    }
+
+    function switchTab(tab) {
+      document.querySelectorAll(".view").forEach(v => v.classList.remove("active"));
+      document.querySelectorAll(".nav-btn").forEach(b => b.classList.remove("active"));
+      document.getElementById("view-" + tab).classList.add("active");
+      document.querySelector(`.nav-btn[data-tab="${tab}"]`).classList.add("active");
+      if (tab === "projects") { renderProjects(); renderTasks(); }
+      if (tab === "settings") renderMemoryList();
+    }
+
+    function openStudio(pane) {
+      switchTab("studio");
+      document.querySelectorAll(".s-pill").forEach(p => p.classList.remove("active"));
+      document.querySelectorAll(".studio-pane").forEach(p => p.classList.remove("active"));
+      document.querySelector(`.s-pill[data-pane="${pane}"]`).classList.add("active");
+      document.getElementById("pane-" + pane).classList.add("active");
+    }
+
+    function buildFullSystemPrompt(extra = "") {
+      const persona = document.getElementById("personaSelect")?.value || "general";
+      const lenMode = document.getElementById("lengthSelect")?.value || "balanced";
+      const customInstr = localStorage.getItem("nova_custom_instr") || "";
+      const memEnabled = localStorage.getItem("nova_mem_enabled") !== "false";
+      const memories = memEnabled ? JSON.parse(localStorage.getItem("nova_memories") || "[]") : [];
+      const proj = getProjects().find(p => p.id === activeProjectId);
+      const map = {
+        general: "You are Nova AI, an intelligent, reliable and multilingual AI assistant.",
+        study: "You are Nova Study Tutor. Explain concepts from basic to advanced with clear examples and formulas.",
+        coding: "You are Nova Coding Expert. Write clean, bug-free code with step-by-step explanations.",
+        writing: "You are Nova Writing Pro. Craft clear, engaging, well-structured content.",
+        research: "You are Nova Research Assistant. Provide structured, analytical explanations."
+      };
+      let sys = `${map[persona]}\n${extra}\n`;
+      if (lenMode === "short") sys += "Keep your response concise and under 4 sentences.\n";
+      if (lenMode === "long") sys += "Provide a comprehensive, detailed explanation.\n";
+      if (memories.length > 0) sys += `USER MEMORY: ${memories.join("; ")}\n`;
+      if (proj && proj.contextText) sys += `PROJECT (${proj.name}) NOTES:\n${proj.contextText.slice(0, 4000)}\n`;
+      if (customInstr) sys += `CUSTOM INSTRUCTIONS: ${customInstr}\n`;
+      sys += "Always detect and reply in the user's language (Hindi, English, Bhojpuri, etc.). Never draw broken ASCII boxes.";
+      return sys;
+    }
+
+    async function callBackend(payload, signal = null) {
+      if (!WORKER_URL) { alert("पहले Settings में Worker URL सेव करें।"); switchTab("settings"); throw new Error("No URL"); }
+      const res = await fetch(WORKER_URL, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload), signal });
+      return await res.json();
+    }
+
+    function renderMarkdownSafe(text) {
+      if (window.marked) {
+        const temp = document.createElement("div");
+        temp.innerHTML = marked.parse(text);
+        temp.querySelectorAll("pre").forEach(pre => {
+          const btn = document.createElement("button");
+          btn.className = "code-copy-btn"; btn.textContent = "Copy";
+          btn.onclick = () => { navigator.clipboard.writeText(pre.innerText.replace(/^Copy\n?/, "")); btn.textContent = "Copied!"; setTimeout(() => btn.textContent = "Copy", 1500); };
+          pre.appendChild(btn);
+        });
+        return temp.innerHTML;
+      }
+      return text.replace(/</g, "&lt;").replace(/\n/g, "<br>");
+    }
+
+    function appendChatBubble(role, text, msgIndex = -1, animateTyping = false) {
+      const feed = document.getElementById("chatFeed");
+      const div = document.createElement("div");
+      div.className = `msg ${role}`;
+      const bodyDiv = document.createElement("div");
+      div.appendChild(bodyDiv);
+
+      if (role === "user") {
+        bodyDiv.textContent = text;
+        const tools = document.createElement("div"); tools.className = "msg-tools";
+        const editBtn = document.createElement("button"); editBtn.className = "chip-btn"; editBtn.textContent = "✏️ Edit";
+        editBtn.onclick = () => {
+          const edited = prompt("संदेश बदलें:", text);
+          if (edited && edited.trim()) {
+            if (msgIndex >= 0) chatHistory = chatHistory.slice(0, msgIndex);
+            saveProjectChat(); rebuildChatFeed();
+            document.getElementById("chatInput").value = edited.trim(); sendChat();
+          }
+        };
+        tools.appendChild(editBtn); div.appendChild(tools);
+      } else {
+        if (animateTyping && text.length < 1800) {
+          let i = 0; const step = Math.max(4, Math.ceil(text.length / 45));
+          const timer = setInterval(() => {
+            i += step; bodyDiv.innerHTML = renderMarkdownSafe(text.slice(0, i)); feed.scrollTop = feed.scrollHeight;
+            if (i >= text.length) { clearInterval(timer); bodyDiv.innerHTML = renderMarkdownSafe(text); }
+          }, 20);
+        } else bodyDiv.innerHTML = renderMarkdownSafe(text);
+
+        const tools = document.createElement("div"); tools.className = "msg-tools";
+        const safeT = text.replace(/"/g, "&quot;");
+        tools.innerHTML = `
+          <button class="chip-btn" onclick="speakSentences(this.dataset.t)" data-t="${safeT}">🔊 Listen</button>
+          <button class="chip-btn" onclick="navigator.clipboard.writeText(this.dataset.t);this.textContent='✅ Copied'" data-t="${safeT}">📋 Copy</button>
+          <button class="chip-btn" onclick="shareText(this.dataset.t)" data-t="${safeT}">📤 Share</button>
+          <button class="chip-btn" onclick="regenerateLast()">🔄 Regenerate</button>`;
+        div.appendChild(tools);
+      }
+      feed.appendChild(div); feed.scrollTop = feed.scrollHeight;
+      return div;
+    }
+
+    function shareText(txt) {
+      if (navigator.share) navigator.share({ title: "Nova AI", text: txt }).catch(() => {});
+      else { navigator.clipboard.writeText(txt); alert("जवाब कॉपी हो गया!"); }
+    }
+
+    async function sendChat(customPrompt = null) {
+      const input = document.getElementById("chatInput");
+      const text = customPrompt || input.value.trim();
+      if (!text) return;
+      input.value = "";
+      document.querySelectorAll(".followup-wrap").forEach(el => el.remove());
+      const userIdx = chatHistory.length;
+      chatHistory.push({ role: "user", content: text });
+      appendChatBubble("user", text, userIdx, false);
+      saveProjectChat();
+
+      const feed = document.getElementById("chatFeed");
+      const loader = document.createElement("div"); loader.className = "msg ai"; loader.textContent = "Nova सोच रहा है...";
+      feed.appendChild(loader); feed.scrollTop = feed.scrollHeight;
+
+      currentAbortController = new AbortController();
+      document.getElementById("sendBtn").style.display = "none";
+      document.getElementById("stopBtn").style.display = "flex";
+
+      try {
+        const sys = buildFullSystemPrompt("Optionally end with 'FOLLOWUPS:' followed by 2 short follow-up questions separated by '|'.");
+        const data = await callBackend({ prompt: text, messages: chatHistory.slice(-10), system: sys }, currentAbortController.signal);
+        loader.remove();
+        let rawReply = data.reply || data.error || "कोई जवाब नहीं मिला।";
+        let followups = [];
+        if (rawReply.includes("FOLLOWUPS:")) {
+          const parts = rawReply.split("FOLLOWUPS:");
+          rawReply = parts[0].trim();
+          followups = parts[1].split("|").map(s => s.trim()).filter(Boolean).slice(0, 3);
+        }
+        const aiIdx = chatHistory.length;
+        chatHistory.push({ role: "assistant", content: rawReply });
+        saveProjectChat();
+        appendChatBubble("ai", rawReply, aiIdx, true);
+        if (followups.length > 0) {
+          const fWrap = document.createElement("div"); fWrap.className = "followup-wrap";
+          followups.forEach(fq => {
+            const c = document.createElement("button"); c.className = "followup-chip"; c.textContent = "💡 " + fq;
+            c.onclick = () => sendChat(fq); fWrap.appendChild(c);
+          });
+          feed.appendChild(fWrap); feed.scrollTop = feed.scrollHeight;
+        }
+      } catch (err) {
+        loader.textContent = err.name === "AbortError" ? "⏹️ जनरेशन रोक दिया गया।" : "⚠️ सर्वर कनेक्शन में समस्या आई।";
+      } finally {
+        document.getElementById("sendBtn").style.display = "flex";
+        document.getElementById("stopBtn").style.display = "none";
+        currentAbortController = null;
+      }
+    }
+
+    function stopGenerating() { if (currentAbortController) currentAbortController.abort(); }
+    function regenerateLast() {
+      if (chatHistory.length < 2) return;
+      if (chatHistory[chatHistory.length - 1].role === "assistant") chatHistory.pop();
+      const lastUser = chatHistory.pop(); rebuildChatFeed();
+      if (lastUser) sendChat(lastUser.content);
+    }
+    function newChat() { chatHistory = []; saveProjectChat(); rebuildChatFeed(); }
+    function rebuildChatFeed() {
+      const feed = document.getElementById("chatFeed"); feed.innerHTML = "";
+      if (chatHistory.length === 0) {
+        appendChatBubble("ai", "नमस्ते! मैं Nova AI हूँ। आप मुझसे हिंदी, भोजपुरी या English में सवाल पूछ सकते हैं या '📞 Live Call' दबाकर बात कर सकते हैं!", -1, false);
+        return;
+      }
+      chatHistory.forEach((m, idx) => appendChatBubble(m.role === "assistant" ? "ai" : "user", m.content, idx, false));
+    }
+    function voiceToChat() {
+      const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+      if (!SR) return alert("Chrome ब्राउज़र इस्तेमाल करें।");
+      const rec = new SR(); rec.lang = "hi-IN";
+      rec.onerror = (e) => alert("Mic Error: " + e.error);
+      rec.onresult = (e) => { document.getElementById("chatInput").value = e.results[0][0].transcript; sendChat(); };
+      rec.start();
+    }
+        let uploadedVisionDataUrl = "";
+    async function runImageGen() {
+      const p = document.getElementById("imgGenPrompt").value.trim();
+      const out = document.getElementById("imgGenOut");
+      if (!p) return alert("फोटो का विवरण लिखें।");
+      out.innerHTML = "🎨 AI आपकी फोटो बना रहा है (5–10 सेकंड)...";
+      try {
+        const data = await callBackend({ type: "image", prompt: p });
+        if (data.image) {
+          out.innerHTML = `<img src="${data.image}" style="max-width:100%;border-radius:12px;margin:8px 0;" /><div class="btn-row" style="justify-content:center;"><a href="${data.image}" download="nova-ai-art.png" class="btn btn-sm" style="text-decoration:none;">⬇️ Save Image</a></div>`;
+        } else out.textContent = "⚠️ " + (data.error || "Image API उपलब्ध नहीं है।");
+      } catch (e) { out.textContent = "⚠️ सर्वर एरर।"; }
+    }
+    function previewVisionImage(ev) {
+      const file = ev.target.files[0]; if (!file) return;
+      const reader = new FileReader();
+      reader.onload = () => {
+        uploadedVisionDataUrl = reader.result;
+        const img = document.getElementById("visionPreviewImg");
+        img.src = uploadedVisionDataUrl; img.style.filter = "none";
+        document.getElementById("visionPreviewWrap").style.display = "flex";
+      };
+      reader.readAsDataURL(file);
+    }
+    function applyCanvasFilter() {
+      document.getElementById("visionPreviewImg").style.filter = `brightness(${document.getElementById("imgBright").value}%) contrast(${document.getElementById("imgContrast").value}%)`;
+    }
+    function downloadEnhancedImg() {
+      const img = document.getElementById("visionPreviewImg");
+      const canvas = document.createElement("canvas");
+      canvas.width = img.naturalWidth; canvas.height = img.naturalHeight;
+      const ctx = canvas.getContext("2d"); ctx.filter = img.style.filter || "none"; ctx.drawImage(img, 0, 0);
+      const a = document.createElement("a"); a.href = canvas.toDataURL("image/png"); a.download = "nova-enhanced.png"; a.click();
+    }
+    async function runVisionAnalyze() {
+      if (!uploadedVisionDataUrl) return alert("पहले फोटो या डायग्राम अपलोड करें।");
+      const q = document.getElementById("visionPrompt").value.trim() || "Explain this image, diagram, or chart in simple Hindi & English.";
+      const out = document.getElementById("visionOut"); out.style.display = "block"; out.textContent = "🔍 विश्लेषण हो रहा है...";
+      try { const data = await callBackend({ type: "vision", image: uploadedVisionDataUrl, prompt: q }); out.innerHTML = renderMarkdownSafe(data.reply || data.error); }
+      catch (e) { out.textContent = "⚠️ विश्लेषण विफल रहा।"; }
+    }
+
+    let extractedPdfText = "";
+    async function handlePdfUpload(ev) {
+      const file = ev.target.files[0]; if (!file) return;
+      const status = document.getElementById("pdfStatus");
+      if (!window.pdfjsLib) return (status.textContent = "⚠️ PDF.js लोड नहीं हुआ।");
+      status.textContent = "⏳ PDF पढ़ा जा रहा है...";
+      try {
+        const pdf = await pdfjsLib.getDocument({ data: await file.arrayBuffer() }).promise;
+        let fullText = "";
+        for (let p = 1; p <= Math.min(pdf.numPages, 25); p++) {
+          const content = await (await pdf.getPage(p)).getTextContent();
+          fullText += `\n--- Page ${p} ---\n` + content.items.map(it => it.str).join(" ");
+        }
+        extractedPdfText = fullText.trim();
+        status.textContent = `✅ "${file.name}" पढ़ा गया (${pdf.numPages} पेज)।`;
+      } catch (err) { status.textContent = "⚠️ PDF त्रुटि: " + err.message; }
+    }
+    async function runPdfAction(action) {
+      if (!extractedPdfText) return alert("पहले PDF अपलोड करें।");
+      const out = document.getElementById("pdfOutBox"); out.style.display = "block"; out.textContent = "⏳ नोट्स बन रहे हैं...";
+      const map = {
+        summary: "Summarize this PDF in Hindi & English.",
+        notes: "Create chapter-wise revision notes from this PDF.",
+        questions: "Extract important exam questions with answers from this PDF.",
+        mcqs: "Create 10 MCQs with 4 options and answers from this PDF.",
+        explain: "Explain difficult concepts in this PDF simply.",
+        custom: document.getElementById("pdfCustomQ").value.trim() || "Explain this PDF."
+      };
+      const data = await callBackend({ prompt: `${map[action]}\n\nPDF:\n${extractedPdfText.slice(0, 14000)}`, system: buildFullSystemPrompt() });
+      out.innerHTML = renderMarkdownSafe(data.reply);
+      document.getElementById("pdfDownloadBtn").style.display = "inline-flex";
+    }
+    function downloadTextFile(name, text) {
+      const a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([text], { type: "text/plain;charset=utf-8" })); a.download = name; a.click();
+    }
+
+    async function runStudyMode(mode) {
+      const subj = document.getElementById("studySubject").value;
+      const lvl = document.getElementById("studyLevel").value;
+      const topic = document.getElementById("studyTopicInput").value.trim();
+      if (!topic) return alert("टॉपिक लिखें।");
+      const outBox = document.getElementById("studyOutBox");
+      const quizBox = document.getElementById("mcqQuizContainer");
+      quizBox.innerHTML = "";
+      if (mode === "mcq") {
+        outBox.style.display = "block"; outBox.textContent = "🎯 MCQ Test तैयार हो रहा है...";
+        try {
+          const data = await callBackend({ prompt: `Generate 5 MCQs on "${topic}" (${subj}, ${lvl}) in Hindi/English. Return ONLY valid JSON array: [{"q":"Question","options":["A","B","C","D"],"ans":0,"exp":"Explanation"}]`, temperature: 0.2 });
+          const qs = JSON.parse((data.reply || "").replace(/```json|```/g, "").trim());
+          outBox.style.display = "none";
+          qs.forEach((item, qIdx) => {
+            const card = document.createElement("div"); card.className = "mcq-card";
+            card.innerHTML = `<strong>Q${qIdx + 1}. ${item.q}</strong>`;
+            const expDiv = document.createElement("div"); expDiv.style.cssText = "display:none;margin-top:8px;font-size:0.8rem;color:#93c5fd;"; expDiv.textContent = "💡 " + (item.exp || "");
+            item.options.forEach((opt, oIdx) => {
+              const btn = document.createElement("button"); btn.className = "mcq-opt"; btn.textContent = `${["A","B","C","D"][oIdx]}. ${opt}`;
+              btn.onclick = () => {
+                card.querySelectorAll(".mcq-opt").forEach((b, i) => { b.disabled = true; if (i === item.ans) b.classList.add("correct"); else if (i === oIdx) b.classList.add("wrong"); });
+                expDiv.style.display = "block";
+              };
+              card.appendChild(btn);
+            });
+            card.appendChild(expDiv); quizBox.appendChild(card);
+          });
+        } catch (e) { outBox.textContent = "⚠️ MCQ लोड नहीं हो पाया, दोबारा दबाएं।"; }
+        return;
+      }
+      const pMap = {
+        explain: `Explain "${topic}" (${subj} - ${lvl}) from basic to advanced in simple Hindi & English.`,
+        steps: `Solve "${topic}" (${subj}) step-by-step with formulas.`,
+        notes: `Create exam revision notes for "${topic}" (${subj}).`,
+        plan: `Create a study plan for "${topic}" (${subj} - ${lvl}).`
+      };
+      outBox.style.display = "block"; outBox.textContent = "📚 नोट्स बन रहे हैं...";
+      const data = await callBackend({ prompt: pMap[mode], system: buildFullSystemPrompt() });
+      outBox.innerHTML = renderMarkdownSafe(data.reply);
+    }
+
+    async function runWebSearch(mode) {
+      const q = document.getElementById("searchQueryInput").value.trim();
+      if (!q) return alert("विषय लिखें।");
+      const srcList = document.getElementById("searchSourcesList");
+      const outBox = document.getElementById("searchOutBox");
+      srcList.innerHTML = ""; outBox.style.display = "block"; outBox.textContent = "🌐 खोज जारी है...";
+      const data = await callBackend({ type: mode, prompt: q });
+      (data.sources || []).forEach((s, i) => {
+        const a = document.createElement("a"); a.className = "source-card"; a.href = s.url; a.target = "_blank";
+        a.innerHTML = `<strong>[${i + 1}] ${s.title}</strong><small>${s.url}</small>`; srcList.appendChild(a);
+      });
+      outBox.innerHTML = renderMarkdownSafe(data.reply);
+    }
+
+    async function runCodingAI(action) {
+      const lang = document.getElementById("codeLangSelect").value;
+      const codeInput = document.getElementById("codePromptInput").value.trim();
+      if (!codeInput) return alert("कोड या समस्या लिखें।");
+      const outBox = document.getElementById("codingOutBox");
+      const iframe = document.getElementById("htmlLivePreview");
+      iframe.style.display = "none"; outBox.style.display = "block"; outBox.textContent = "💻 कोड तैयार हो रहा है...";
+      const map = { generate: `Write ${lang} code for:\n${codeInput}`, explain: `Explain this ${lang} code:\n${codeInput}`, debug: `Fix bugs in this ${lang} code:\n${codeInput}` };
+      const data = await callBackend({ prompt: map[action], system: buildFullSystemPrompt() });
+      outBox.innerHTML = renderMarkdownSafe(data.reply || "");
+      const m = (data.reply || "").match(/```html([\s\S]*?)```/i);
+      if (m && m[1]) { iframe.style.display = "block"; iframe.srcdoc = m[1]; }
+    }
+
+    let parsedDatasetSummary = "", activeChart = null;
+    function handleDataFile(ev) {
+      const file = ev.target.files[0]; if (!file || !window.XLSX) return;
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const wb = XLSX.read(e.target.result, { type: "array" });
+        const rows = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]]);
+        if (!rows.length) return alert("फाइल खाली है।");
+        const cols = Object.keys(rows[0]);
+        parsedDatasetSummary = `File: ${file.name}, Rows: ${rows.length}, Cols: ${cols.join(", ")}\nSample: ${JSON.stringify(rows.slice(0, 15))}`;
+        document.getElementById("dataSummaryStats").textContent = `✅ ${file.name} लोड हो गई (${rows.length} Rows)`;
+        const numCol = cols.find(c => typeof rows[0][c] === "number") || cols[1];
+        if (numCol && window.Chart) {
+          const canvas = document.getElementById("dataChartCanvas"); canvas.style.display = "block";
+          if (activeChart) activeChart.destroy();
+          activeChart = new Chart(canvas, { type: "bar", data: { labels: rows.slice(0, 12).map(r => String(r[cols[0]]).slice(0, 12)), datasets: [{ label: numCol, data: rows.slice(0, 12).map(r => Number(r[numCol]) || 0), backgroundColor: "#3b82f6" }] } });
+        }
+      };
+      reader.readAsArrayBuffer(file);
+    }
+    async function analyzeUploadedData() {
+      if (!parsedDatasetSummary) return alert("पहले CSV/Excel अपलोड करें।");
+      const out = document.getElementById("dataOutBox"); out.style.display = "block"; out.textContent = "📊 विश्लेषण हो रहा है...";
+      const data = await callBackend({ prompt: `Analyze this dataset in Hindi & English:\n${parsedDatasetSummary}` });
+      out.innerHTML = renderMarkdownSafe(data.reply);
+    }
+
+    async function createRealFile(fmt) {
+      const topic = document.getElementById("docTopicInput").value.trim();
+      const lang = document.getElementById("docLangSelect").value;
+      const status = document.getElementById("docStatusBox");
+      if (!topic) return alert("विषय लिखें।");
+      status.textContent = `⏳ ${fmt.toUpperCase()} फाइल बन रही है...`;
+      try {
+        if (fmt === "pptx") {
+          const res = await callBackend({ prompt: `Create 5 slides on "${topic}" in ${lang}. Return ONLY JSON array: [{"title":"Title","bullets":["B1","B2"]}]`, temperature: 0.2 });
+          const slides = JSON.parse((res.reply || "").replace(/```json|```/g, "").trim());
+          const pptx = new PptxGenJS();
+          slides.forEach(s => {
+            const sl = pptx.addSlide(); sl.background = { color: "0F172A" };
+            sl.addText(s.title, { x: 0.5, y: 0.5, w: 9, h: 0.8, fontSize: 24, bold: true, color: "60A5FA" });
+            sl.addText((s.bullets || []).map(b => "• " + b).join("\n"), { x: 0.6, y: 1.5, w: 8.8, h: 4.5, fontSize: 16, color: "F1F5F9" });
+          });
+          await pptx.writeFile({ fileName: `Nova-${topic.slice(0, 18)}.pptx` });
+          status.textContent = "✅ PPT डाउनलोड हो गई!";
+        } else if (fmt === "xlsx") {
+          const res = await callBackend({ prompt: `Create table rows for "${topic}" in ${lang}. Return ONLY JSON array of objects.`, temperature: 0.2 });
+          const wb = XLSX.utils.book_new();
+          XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(JSON.parse((res.reply || "").replace(/```json|```/g, "").trim())), "Nova");
+          XLSX.writeFile(wb, `Nova-${topic.slice(0, 18)}.xlsx`);
+          status.textContent = "✅ Excel डाउनलोड हो गई!";
+        } else {
+          const res = await callBackend({ prompt: `Write complete notes on "${topic}" in ${lang}.` });
+          const txt = res.reply || "";
+          if (fmt === "pdf" && window.jspdf) {
+            const doc = new window.jspdf.jsPDF();
+            doc.text(doc.splitTextToSize(txt.replace(/[^\x00-\x7F]/g, " "), 180).slice(0, 45), 14, 18);
+            doc.save(`Nova-${topic.slice(0, 18)}.pdf`);
+            status.textContent = "✅ PDF डाउनलोड हो गई!";
+          } else {
+            const a = document.createElement("a");
+            a.href = URL.createObjectURL(new Blob([`<html><body>${renderMarkdownSafe(txt)}</body></html>`], { type: "application/msword" }));
+            a.download = `Nova-${topic.slice(0, 18)}.doc`; a.click();
+            status.textContent = "✅ Word फाइल डाउनलोड हो गई!";
+          }
+        }
+      } catch (e) { status.textContent = "⚠️ फाइल नहीं बन पाई, दोबारा प्रयास करें।"; }
+    }
+
+    async function runWritingAI() {
+      const text = document.getElementById("writeInput").value.trim(); if (!text) return alert("टेक्स्ट लिखें।");
+      const out = document.getElementById("writeOutBox"); out.style.display = "block"; out.textContent = "✍️ लिख रहा हूँ...";
+      const data = await callBackend({ prompt: `Task: ${document.getElementById("writeType").value}\nTone: ${document.getElementById("writeTone").value}\nInput:\n${text}` });
+      out.innerHTML = renderMarkdownSafe(data.reply);
+    }
+    function swapTransLangs() {
+      const f = document.getElementById("transFrom"), t = document.getElementById("transTo");
+      if (f.value !== "Auto Detect") { const tmp = f.value; f.value = t.value; t.value = tmp; }
+    }
+    async function runTranslator() {
+      const txt = document.getElementById("transSourceText").value.trim(); if (!txt) return alert("टेक्स्ट लिखें।");
+      const box = document.getElementById("transResultBox"); box.style.display = "block"; box.textContent = "🌐 अनुवाद हो रहा है...";
+      const data = await callBackend({ prompt: `Translate from ${document.getElementById("transFrom").value} to ${document.getElementById("transTo").value} (only output translation):\n${txt}`, temperature: 0.2 });
+      box.textContent = data.reply; document.getElementById("transActions").style.display = "flex";
+    }
+
+    function getProjects() {
+      let l = JSON.parse(localStorage.getItem("nova_projects") || "[]");
+      if (!l.length) { l = [{ id: "default", name: "General Workspace", messages: [], contextText: "" }]; localStorage.setItem("nova_projects", JSON.stringify(l)); }
+      return l;
+    }
+    function saveProjects(l) { localStorage.setItem("nova_projects", JSON.stringify(l)); }
+    function loadActiveProjectChat() {
+      const l = getProjects(); const p = l.find(x => x.id === activeProjectId) || l[0];
+      activeProjectId = p.id; chatHistory = p.messages || [];
+      document.getElementById("activeProjBadge").textContent = `📁 ${p.name}`; rebuildChatFeed();
+    }
+    function saveProjectChat() {
+      const l = getProjects(); const i = l.findIndex(x => x.id === activeProjectId);
+      if (i >= 0) { l[i].messages = chatHistory.slice(-30); saveProjects(l); }
+    }
+    function createNewProject() {
+      const n = prompt("प्रोजेक्ट का नाम:"); if (!n || !n.trim()) return;
+      const l = getProjects(), id = "proj_" + Date.now();
+      l.unshift({ id, name: n.trim(), messages: [], contextText: "" }); saveProjects(l);
+      activeProjectId = id; localStorage.setItem("nova_active_project", id); renderProjects(); loadActiveProjectChat();
+    }
+    function renderProjects() {
+      const q = (document.getElementById("projectSearchInput")?.value || "").toLowerCase();
+      const wrap = document.getElementById("projectsList"); if (!wrap) return;
+      wrap.innerHTML = "";
+      getProjects().filter(p => p.name.toLowerCase().includes(q)).forEach(p => {
+        const r = document.createElement("div"); r.className = "card"; r.style.padding = "10px";
+        r.innerHTML = `<div style="display:flex;justify-content:space-between;align-items:center;"><strong style="cursor:pointer;font-size:0.86rem;" onclick="selectProject('${p.id}')">📁 ${p.name}</strong><div style="display:flex;gap:4px;"><button class="btn btn-sm btn-ghost" onclick="uploadProjectFile('${p.id}')">📎</button><button class="btn btn-sm btn-ghost" onclick="renameProject('${p.id}')">✏️</button>${p.id !== "default" ? `<button class="btn btn-sm btn-danger" onclick="deleteProject('${p.id}')">🗑️</button>` : ""}</div></div>`;
+        wrap.appendChild(r);
+      });
+    }
+    function selectProject(id) { activeProjectId = id; localStorage.setItem("nova_active_project", id); loadActiveProjectChat(); switchTab("chat"); }
+    function renameProject(id) { const l = getProjects(), p = l.find(x => x.id === id), n = prompt("नया नाम:", p?.name); if (n && n.trim()) { p.name = n.trim(); saveProjects(l); renderProjects(); loadActiveProjectChat(); } }
+    function deleteProject(id) { saveProjects(getProjects().filter(x => x.id !== id)); if (activeProjectId === id) { activeProjectId = "default"; loadActiveProjectChat(); } renderProjects(); }
+    function uploadProjectFile(id) {
+      const inp = document.createElement("input"); inp.type = "file"; inp.accept = ".txt,.md,.csv,.json";
+      inp.onchange = (e) => {
+        const f = e.target.files[0]; if (!f) return;
+        const r = new FileReader(); r.onload = () => { const l = getProjects(), p = l.find(x => x.id === id); if (p) { p.contextText = (p.contextText || "") + `\n[${f.name}]:\n` + r.result; saveProjects(l); alert("✅ फाइल जुड़ गई!"); } };
+        r.readAsText(f);
+      }; inp.click();
+    }
+
+    function requestNotifPerm() { if ("Notification" in window) Notification.requestPermission().then(p => alert("Permission: " + p)); }
+    function addTaskReminder() {
+      const title = document.getElementById("taskTitleInput").value.trim(); if (!title) return alert("टास्क लिखें।");
+      const tasks = JSON.parse(localStorage.getItem("nova_tasks") || "[]");
+      tasks.unshift({ id: Date.now(), title, date: document.getElementById("taskDateInput").value, time: document.getElementById("taskTimeInput").value, done: false, notified: false });
+      localStorage.setItem("nova_tasks", JSON.stringify(tasks)); document.getElementById("taskTitleInput").value = ""; renderTasks();
+    }
+    function renderTasks() {
+      const wrap = document.getElementById("tasksList"); if (!wrap) return;
+      const tasks = JSON.parse(localStorage.getItem("nova_tasks") || "[]");
+      wrap.innerHTML = tasks.length ? "" : "<small style='color:var(--muted)'>कोई रिमाइंडर नहीं है।</small>";
+      tasks.forEach(t => {
+        const d = document.createElement("div"); d.style.cssText = "display:flex;justify-content:space-between;align-items:center;background:#0c1020;padding:8px 10px;border-radius:10px;";
+        d.innerHTML = `<div style="text-decoration:${t.done ? "line-through" : "none"}"><strong style="font-size:0.84rem;">${t.title}</strong><div style="font-size:0.7rem;color:var(--muted);">${t.date || ""} ${t.time || ""}</div></div><div style="display:flex;gap:4px;"><button class="btn btn-sm btn-ghost" onclick="toggleTaskDone(${t.id})">✓</button><button class="btn btn-sm btn-danger" onclick="deleteTask(${t.id})">✕</button></div>`;
+        wrap.appendChild(d);
+      });
+    }
+    function toggleTaskDone(id) { const t = JSON.parse(localStorage.getItem("nova_tasks") || "[]"); const x = t.find(i => i.id === id); if (x) x.done = !x.done; localStorage.setItem("nova_tasks", JSON.stringify(t)); renderTasks(); }
+    function deleteTask(id) { localStorage.setItem("nova_tasks", JSON.stringify(JSON.parse(localStorage.getItem("nova_tasks") || "[]").filter(i => i.id !== id))); renderTasks(); }
+    function checkDueReminders() {
+      const tasks = JSON.parse(localStorage.getItem("nova_tasks") || "[]"), now = new Date(); let ch = false;
+      tasks.forEach(t => { if (!t.done && !t.notified && t.date && t.time && now >= new Date(`${t.date}T${t.time}`)) { t.notified = true; ch = true; alert("⏰ Nova Reminder: " + t.title); } });
+      if (ch) localStorage.setItem("nova_tasks", JSON.stringify(tasks));
+    }
+
+    function toggleMemorySetting() { localStorage.setItem("nova_mem_enabled", document.getElementById("memoryToggle").checked); }
+    function addMemoryFact() {
+      const inp = document.getElementById("newMemoryInput"); if (!inp.value.trim()) return;
+      const l = JSON.parse(localStorage.getItem("nova_memories") || "[]"); l.push(inp.value.trim());
+      localStorage.setItem("nova_memories", JSON.stringify(l)); inp.value = ""; renderMemoryList();
+    }
+    function renderMemoryList() {
+      const wrap = document.getElementById("memoryList"); if (!wrap) return;
+      wrap.innerHTML = "";
+      JSON.parse(localStorage.getItem("nova_memories") || "[]").forEach((m, i) => {
+        const d = document.createElement("div"); d.style.cssText = "display:flex;justify-content:space-between;align-items:center;background:#0c1020;padding:7px 10px;border-radius:8px;font-size:0.8rem;";
+        d.innerHTML = `<span>🧠 ${m}</span><button class="btn btn-sm btn-danger" onclick="removeMemory(${i})">✕</button>`; wrap.appendChild(d);
+      });
+    }
+    function removeMemory(i) { const l = JSON.parse(localStorage.getItem("nova_memories") || "[]"); l.splice(i, 1); localStorage.setItem("nova_memories", JSON.stringify(l)); renderMemoryList(); }
+    function saveCustomInstructions() { localStorage.setItem("nova_custom_instr", document.getElementById("customInstrInput").value.trim()); alert("✅ Saved!"); }
+
+    const CALL_LANGUAGES = [
+      { id: "auto", label: "✨ Auto (सभी भाषाएँ)", recLang: "hi-IN", promptLang: "whatever language the user speaks", greet: "हैलो! मैं Nova बोल रहा हूँ। आप किसी भी भाषा में बात कर सकते हैं!" },
+      { id: "hi", label: "🇮🇳 हिन्दी (Hindi)", recLang: "hi-IN", promptLang: "pure Devanagari Hindi", greet: "नमस्ते! मैं Nova बोल रहा हूँ। बताइए, क्या मदद करूँ?" },
+      { id: "bho", label: "🌾 भोजपुरी (Bhojpuri)", recLang: "hi-IN", promptLang: "natural Bhojpuri in Devanagari", greet: "प्रणाम! हम Nova बोलत बानी। बताईं, का हाल बा?" },
+      { id: "mai", label: "🪷 मैथिली (Maithili)", recLang: "hi-IN", promptLang: "natural Maithili in Devanagari", greet: "प्रणाम! हम Nova बाजि रहल छी। कहू, की हाल अछि?" },
+      { id: "en", label: "🇬🇧 English", recLang: "en-IN", promptLang: "natural English", greet: "Hello! This is Nova speaking. How can I help you?" },
+      { id: "bn", label: "🇮🇳 বাংলা (Bengali)", recLang: "bn-IN", promptLang: "Bengali script", greet: "নমস্কার! আমি নোভা বলছি। বলুন?" },
+      { id: "mr", label: "🇮🇳 मराठी (Marathi)", recLang: "mr-IN", promptLang: "Marathi script", greet: "नमस्कार! मी नोव्हा बोलतोय. बोला?" },
+      { id: "ta", label: "🇮🇳 தமிழ் (Tamil)", recLang: "ta-IN", promptLang: "Tamil script", greet: "வணக்கம்! நான் நோவா பேசுகிறேன்." },
+      { id: "te", label: "🇮🇳 తెలుగు (Telugu)", recLang: "te-IN", promptLang: "Telugu script", greet: "నమస్కారం! నేను నోవా మాట్లాడుతున్నాను." },
+      { id: "gu", label: "🇮🇳 ગુજરાતી (Gujarati)", recLang: "gu-IN", promptLang: "Gujarati script", greet: "નમસ્તે! હું નોવા બોલું છું." },
+      { id: "pa", label: "🇮🇳 ਪੰਜਾਬੀ (Punjabi)", recLang: "pa-IN", promptLang: "Punjabi script", greet: "ਸਤ ਸ੍ਰੀ ਅਕਾਲ! ਮੈਂ ਨੋਵਾ ਬੋਲ ਰਿਹਾ ਹਾਂ।" },
+      { id: "ur", label: "🇵🇰 اردو (Urdu)", recLang: "ur-IN", promptLang: "Urdu script", greet: "السلام علیکم! میں نووا بول رہا ہوں۔" }
+    ];
+    let selectedCallLang = CALL_LANGUAGES[0], speechCancelled = false, inCall = false, callMuted = false, callRec = null, callHistory = [], timerInt = null, callSecs = 0;
+
+    function detectScriptLang(t) {
+      if (/[\u0980-\u09FF]/.test(t)) return "bn-IN"; if (/[\u0A00-\u0A7F]/.test(t)) return "pa-IN";
+      if (/[\u0A80-\u0AFF]/.test(t)) return "gu-IN"; if (/[\u0B80-\u0BFF]/.test(t)) return "ta-IN";
+      if (/[\u0C00-\u0C7F]/.test(t)) return "te-IN"; if (/[\u0600-\u06FF]/.test(t)) return "ur-IN";
+      if (/[\u0900-\u097F]/.test(t)) return selectedCallLang.id === "mr" ? "mr-IN" : "hi-IN";
+      return "en-IN";
+    }
+    function speakSentences(rawText, onDone = null) {
+      window.speechSynthesis.cancel(); speechCancelled = false;
+      const cleaned = rawText.replace(/[*#_`~>\[\]()]/g, " ").replace(/https?:\/\/\S+/g, "").replace(/\s+/g, " ").trim();
+      if (!cleaned) { if (onDone) onDone(); return; }
+      const chunks = cleaned.match(/[^।.!?؟]+[।.!?؟]*/g) || [cleaned]; let idx = 0;
+      const voices = window.speechSynthesis.getVoices();
+      function next() {
+        if (speechCancelled || idx >= chunks.length) { if (!speechCancelled && onDone) onDone(); return; }
+        const part = chunks[idx++].trim(); if (!part) return next();
+        const u = new SpeechSynthesisUtterance(part); window.activeUtter = u;
+        const lang = detectScriptLang(part); u.lang = lang;
+        const v = voices.find(x => x.lang.toLowerCase() === lang.toLowerCase()) || voices.find(x => x.lang.toLowerCase().startsWith(lang.split("-")[0]));
+        if (v) u.voice = v; u.onend = next; u.onerror = next; window.speechSynthesis.speak(u);
+      }
+      next();
+    }
+    function openLangModal() {
+      const g = document.getElementById("langGrid"); g.innerHTML = "";
+      CALL_LANGUAGES.forEach(l => {
+        const b = document.createElement("button"); b.className = "lang-opt" + (l.id === selectedCallLang.id ? " selected" : ""); b.textContent = l.label;
+        b.onclick = () => {
+          selectedCallLang = l; document.getElementById("callLangText").textContent = l.label.replace(/^[^\s]+\s/, "").split(" ")[0]; closeLangModal();
+          if (inCall) { speechCancelled = true; window.speechSynthesis.cancel(); if (callRec) try { callRec.abort(); } catch (e) {} document.getElementById("callCaptions").textContent = l.greet; speakSentences(l.greet, () => { if (inCall && !callMuted) listenOnCall(); }); }
+        }; g.appendChild(b);
+      });
+      document.getElementById("langModal").classList.add("open");
+    }
+    function closeLangModal() { document.getElementById("langModal").classList.remove("open"); }
+    function startPhoneCall() {
+      if (!WORKER_URL) { alert("पहले Settings में Worker URL डालें।"); return switchTab("settings"); }
+      const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+      if (!SR) return alert("Live Call के लिए Google Chrome का उपयोग करें।");
+      inCall = true; callMuted = false; callHistory = []; callSecs = 0;
+      document.getElementById("callTimer").textContent = "Calling..."; document.getElementById("callCaptions").textContent = "कॉल लग रही है...";
+      document.getElementById("callOverlay").classList.add("open"); document.getElementById("avatarWrap").className = "avatar-ring-wrap ringing";
+      setTimeout(() => {
+        if (!inCall) return; clearInterval(timerInt);
+        timerInt = setInterval(() => { callSecs++; document.getElementById("callTimer").textContent = `${String(Math.floor(callSecs/60)).padStart(2,"0")}:${String(callSecs%60).padStart(2,"0")}`; }, 1000);
+        document.getElementById("callCaptions").textContent = selectedCallLang.greet; document.getElementById("callStatusPill").textContent = "Nova बोल रहा है...";
+        document.getElementById("avatarWrap").className = "avatar-ring-wrap speaking";
+        speakSentences(selectedCallLang.greet, () => { if (inCall && !callMuted) listenOnCall(); });
+      }, 1100);
+    }
+    function endPhoneCall() { inCall = false; speechCancelled = true; window.speechSynthesis.cancel(); clearInterval(timerInt); if (callRec) try { callRec.abort(); } catch (e) {} document.getElementById("callOverlay").classList.remove("open"); }
+    function toggleCallMute() { callMuted = !callMuted; if (callMuted) { if (callRec) try { callRec.abort(); } catch (e) {} document.getElementById("callStatusPill").textContent = "कॉल म्यूट है"; } else listenOnCall(); }
+    function interruptCallSpeech() { speechCancelled = true; window.speechSynthesis.cancel(); if (inCall && !callMuted) listenOnCall(); }
+    function listenOnCall() {
+      if (!inCall || callMuted) return;
+      const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+      if (callRec) try { callRec.abort(); } catch (e) {}
+      callRec = new SR(); callRec.lang = selectedCallLang.recLang; callRec.interimResults = true; let captured = "";
+      callRec.onstart = () => { document.getElementById("avatarWrap").className = "avatar-ring-wrap listening"; document.getElementById("callStatusPill").textContent = "सुन रहा हूँ... बोलिए"; };
+      callRec.onresult = (e) => { let interim = ""; for (let i = e.resultIndex; i < e.results.length; i++) { if (e.results[i].isFinal) captured += e.results[i][0].transcript; else interim += e.results[i][0].transcript; } document.getElementById("callCaptions").textContent = "आप: " + (captured || interim); };
+      callRec.onerror = () => { if (inCall && !callMuted) setTimeout(listenOnCall, 200); };
+      callRec.onend = () => { if (!inCall || callMuted) return; if (captured.trim()) replyOnCall(captured.trim()); else setTimeout(listenOnCall, 150); };
+      try { callRec.start(); } catch (e) {}
+    }
+    async function replyOnCall(userText) {
+      document.getElementById("avatarWrap").className = "avatar-ring-wrap"; document.getElementById("callStatusPill").textContent = "Nova सोच रहा है...";
+      callHistory.push({ role: "user", content: userText });
+      try {
+        const data = await callBackend({ prompt: userText, messages: callHistory.slice(-6), system: `You are Nova AI on a live phone call. Speak ONLY in ${selectedCallLang.promptLang}. Keep answers natural and short (1-3 sentences). No markdown or emojis.` });
+        const reply = data.reply || "कृपया दोबारा बोलें।"; callHistory.push({ role: "assistant", content: reply });
+        if (!inCall) return; document.getElementById("callCaptions").textContent = reply;
+        document.getElementById("avatarWrap").className = "avatar-ring-wrap speaking"; document.getElementById("callStatusPill").textContent = "Nova बोल रहा है...";
+        speakSentences(reply, () => { if (inCall && !callMuted) listenOnCall(); });
+      } catch (e) { if (inCall && !callMuted) listenOnCall(); }
+    }
+  </script>
+</body>
+</html>
