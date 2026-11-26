@@ -534,4 +534,21 @@
       const r = new SR();
       r.lang = document.getElementById("voiceLangSel").value || "hi-IN";
       r.onerror = e => alert("Microphone Error: " + e.error + ". Browser me Mic permission allow karein.");
-      r.onresult = e =>
+      r.onresult = e => { document.getElementById("promptIn").value = e.results[0][0].transcript; sendReq(); };
+      r.start();
+    }
+
+    function speakTTS(raw) {
+      window.speechSynthesis.cancel();
+      const txt = raw.replace(/[*#_`~>\[\]()]/g, " ").replace(/https?:\/\/\S+/g, "").trim();
+      if (!txt) return;
+      const u = new SpeechSynthesisUtterance(txt);
+      u.lang = /[\u0900-\u097F]/.test(txt) ? "hi-IN" : "en-IN";
+      document.getElementById("ttsBar").style.display = "flex";
+      u.onend = () => { document.getElementById("ttsBar").style.display = "none"; };
+      window.speechSynthesis.speak(u);
+    }
+    function stopTTS() { window.speechSynthesis.cancel(); document.getElementById("ttsBar").style.display = "none"; }
+  </script>
+</body>
+</html>
